@@ -1,0 +1,2977 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>于洪 · 互动小说</title>
+<style>:root {
+  --ink: #d8d2c4;
+  --dim: #8d8679;
+  --bg: #100f0d;
+  --panel: #171614;
+  --line: #2a2723;
+  --accent: #b08d57;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #1d1b17 0%, transparent 60%),
+    radial-gradient(900px 500px at 110% 110%, #191512 0%, transparent 55%),
+    var(--bg);
+  color: var(--ink);
+  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", Georgia, serif;
+  font-size: 16.5px;
+  line-height: 1.95;
+  letter-spacing: .02em;
+}
+.hidden { display: none !important; }
+
+/* ---------- 菜单 ---------- */
+#menu {
+  min-height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+}
+.menutitle {
+  font-size: 64px; letter-spacing: .34em; margin: 0 0 6px;
+  color: #e8e0d0; font-weight: 400;
+  text-shadow: 0 0 40px rgba(176,141,87,.22);
+}
+.menusub { color: var(--dim); letter-spacing: .28em; font-size: 13px; margin-bottom: 26px; }
+.menuquote {
+  max-width: 620px; color: #a29a8b; font-size: 15px; line-height: 2.1;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding: 18px 10px; margin-bottom: 34px;
+}
+.menuquote em { color: var(--accent); font-style: normal; }
+.menubtns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.menubtns .choice { min-width: 210px; }
+.menuload { margin-top: 18px; }
+
+/* ---------- 模型设置 ---------- */
+.cfgbox {
+  margin-top: 26px; max-width: 620px; width: 100%;
+  border: 1px solid var(--line); background: var(--panel);
+  text-align: left;
+}
+.cfgbox summary {
+  cursor: pointer; padding: 11px 16px; font-size: 12.5px;
+  color: var(--dim); letter-spacing: .12em; user-select: none;
+}
+.cfgbox summary:hover { color: var(--ink); }
+.cfgstate { color: var(--accent); margin-left: 6px; }
+.cfgbody { padding: 4px 16px 16px; border-top: 1px solid var(--line); }
+.cfgnote { font-size: 12px; color: var(--dim); line-height: 1.9; margin: 12px 0 14px; }
+.cfgrow { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.cfglabel { width: 84px; flex: none; font-size: 12.5px; color: var(--dim); }
+.cfginput {
+  flex: 1; min-width: 0; background: #0e0d0b; border: 1px solid var(--line);
+  color: var(--ink); font-family: inherit; font-size: 12.5px;
+  padding: 7px 10px; border-radius: 2px; outline: none;
+}
+.cfginput:focus { border-color: var(--accent); }
+.cfginput::placeholder { color: #4f4a42; }
+.cfgbtns { display: flex; gap: 8px; margin-top: 12px; }
+.cfgbtn {
+  background: none; border: 1px solid var(--line); color: var(--dim);
+  padding: 6px 14px; font-size: 12px; cursor: pointer; border-radius: 2px;
+  font-family: inherit; letter-spacing: .1em;
+}
+.cfgbtn:hover { color: var(--ink); border-color: var(--accent); }
+.cfgbtn.ghost:hover { border-color: #6b2f28; color: #c96a5f; }
+.cfgmsg { margin-top: 10px; font-size: 12px; line-height: 1.7; color: var(--dim); min-height: 18px; }
+.cfgmsg.ok { color: #7f9c6b; }
+.cfgmsg.err { color: #c96a5f; }
+
+/* ---------- 游戏 ---------- */
+#game { min-height: 100%; display: flex; flex-direction: column; }
+#topbar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 18px; border-bottom: 1px solid var(--line);
+  background: rgba(16,15,13,.86); backdrop-filter: blur(6px);
+  position: sticky; top: 0; z-index: 5;
+}
+#topbar .brand { font-size: 15px; letter-spacing: .22em; color: var(--accent); }
+#topbar .spacer { flex: 1; }
+#topbar button {
+  background: none; border: 1px solid var(--line); color: var(--dim);
+  padding: 5px 12px; font-size: 12.5px; cursor: pointer; border-radius: 2px;
+  font-family: inherit; letter-spacing: .1em;
+}
+#topbar button:hover { color: var(--ink); border-color: #4a443c; }
+
+#main { flex: 1; display: flex; max-width: 1080px; width: 100%; margin: 0 auto; padding: 26px 20px 120px; gap: 28px; }
+#stage { flex: 1; min-width: 0; }
+#side { width: 258px; flex: none; }
+@media (max-width: 860px) {
+  #main { flex-direction: column-reverse; padding-bottom: 60px; }
+  #side { width: 100%; }
+}
+
+/* 状态卡 */
+.who-card { border-left: 3px solid; padding-left: 12px; margin-bottom: 12px; background: var(--panel); padding: 12px 12px 12px 15px; }
+.wname { font-size: 21px; letter-spacing: .14em; }
+.wtitle { font-size: 12px; color: var(--dim); line-height: 1.7; margin-top: 3px; }
+.stats { display: flex; flex-direction: column; gap: 9px; }
+.stat { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--dim); }
+.sl { width: 74px; flex: none; }
+.bar { flex: 1; height: 5px; background: #221f1b; border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; transition: width .5s ease; }
+.sv { width: 26px; text-align: right; font-size: 11px; }
+
+/* 文字流 */
+#stream { max-width: 100%; }
+.scene-title {
+  margin: 34px 0 6px; padding-top: 15px; border-top: 1px solid var(--line);
+  font-size: 13px; letter-spacing: .3em; color: var(--accent);
+}
+.scene-where { font-size: 12px; color: var(--dim); letter-spacing: .12em; margin-bottom: 16px; }
+.line { margin: 0 0 12px; }
+.line .body { white-space: pre-wrap; }
+.line.said .body { color: #e6ddcb; }
+.line.nar .body { color: #b9b2a4; }
+.line.inner .body { color: #9d9487; font-style: italic; padding-left: 14px; border-left: 1px solid #332e28; }
+.line.dream .body { color: #7d97a8; font-style: italic; }
+.line.quote .body { color: #a89272; }
+.line.bridge .body { color: var(--accent); letter-spacing: .08em; margin: 18px 0; }
+.line.err .body { color: #b03a2e; }
+.line.chosen .body { color: var(--dim); font-size: 13.5px; margin: 14px 0 6px; letter-spacing: .04em; }
+.model-line { color: #8fa6a0; font-size: 14.5px; border-left: 2px solid #2f3a38; padding-left: 12px; margin: 16px 0 8px; line-height: 2; }
+.model-line.pending { color: #4f5b59; font-style: italic; border-left-color: #232c2b; }
+.quick { animation: fadein .18s ease; }
+@keyframes fadein { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; } }
+
+/* 说话人 */
+.who { margin-right: 8px; font-size: 13px; letter-spacing: .1em; }
+.who.liu { color: #c96a5f; }
+.who.hao { color: #7a9fd0; }
+.who.jie { color: #d1b072; }
+.who.chen { color: #c08cb8; }
+.who.mom { color: #a9a08f; }
+.who.you { color: #a9a08f; }
+.who:not(.liu):not(.hao):not(.jie):not(.chen):not(.mom):not(.you) { color: #8d8679; }
+
+/* 选项 */
+#choices { margin-top: 22px; display: flex; flex-direction: column; gap: 9px; }
+.choice {
+  text-align: left; background: var(--panel); border: 1px solid var(--line); color: var(--ink);
+  padding: 12px 16px; font-family: inherit; font-size: 14.5px; line-height: 1.7;
+  cursor: pointer; border-radius: 2px; transition: all .16s ease;
+  display: flex; align-items: baseline; gap: 10px;
+}
+.choice:hover { border-color: var(--accent); background: #1c1a16; transform: translateX(3px); }
+.choice .tag { font-size: 11px; color: var(--accent); letter-spacing: .16em; flex: none; }
+.choice.continue { justify-content: center; color: var(--accent); border-style: dashed; }
+.choice.continue:hover { background: #1c1a16; }
+
+/* 结局 */
+#ending { position: fixed; inset: 0; background: rgba(8,7,6,.94); z-index: 40; display: flex; align-items: center; justify-content: center; padding: 24px; overflow: auto; }
+.end-card {
+  max-width: 560px; width: 100%; border: 1px solid #3a352d; background: #131210;
+  padding: 36px 30px; text-align: center; animation: fadein .5s ease;
+}
+.end-kicker { font-size: 11px; letter-spacing: .4em; color: var(--dim); }
+.end-title { font-size: 38px; font-weight: 400; margin: 12px 0 8px; color: #e8e0d0; letter-spacing: .14em; }
+.end-desc { color: var(--accent); font-size: 14px; margin-bottom: 20px; }
+.end-you { color: var(--dim); font-size: 13px; margin-bottom: 18px; }
+.end-summary { text-align: left; font-size: 14px; color: #b9b2a4; line-height: 2; border-top: 1px solid var(--line); padding-top: 16px; }
+.end-quote { margin-top: 18px; font-style: italic; color: #8d8679; font-size: 13.5px; }
+.end-btns { margin-top: 26px; display: flex; justify-content: center; }
+.end-btns .choice { min-width: 240px; justify-content: center; }
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-thumb { background: #2a2723; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div id="menu">
+  <h1 class="menutitle">于洪</h1>
+  <div class="menusub">班宇《于洪》· 互动小说 · 二〇〇四年的沈阳</div>
+  <div class="menuquote">
+    洪水是有温度的，内部暖热，这点没想到过。但也危险，如旋涡一般，拉着我们往下坠。<br>
+    ——一九九八年，你是抗洪一代。一声令下，半句废话没有。<br>
+    可回来之后，反而越活越越回旋了。<br>
+    <em>这一次，你可以选一个人，替他把那几年重新走一遍。</em>
+  </div>
+  <div class="menubtns">
+    <button class="choice" onclick="randomStart()"><span class="tag">随机</span><span>随机进入一个人的叙述</span></button>
+    <button class="choice" onclick="startGame('liu')"><span class="tag">刘阳</span><span>从部队复员，在家等分配</span></button>
+    <button class="choice" onclick="startGame('hao')"><span class="tag">郝鹏飞</span><span>在九路市场底下看自行车</span></button>
+    <button class="choice" onclick="startGame('jie')"><span class="tag">郝洁</span><span>从大连回来，伺候妈</span></button>
+    <button class="choice" onclick="startGame('chen')"><span class="tag">陈红</span><span>汽配城的经营点，还有一笔钱</span></button>
+  </div>
+
+  <details id="cfgbox" class="cfgbox">
+    <summary>模型设置 <span class="cfgstate" id="cfgstate">未配置（离线模式）</span></summary>
+    <div class="cfgbody">
+      <p class="cfgnote">
+        填写 OpenAI 兼容接口后，关键节点会由模型实时续写一小段。不填也能完整游玩，只是所有剧情按写好的走。
+      </p>
+      <label class="cfgrow">
+        <span class="cfglabel">模型地址</span>
+        <input id="cfgUrl" class="cfginput" type="text" placeholder="http://127.0.0.1:11434/v1/chat/completions" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="cfgrow">
+        <span class="cfglabel">模型 ID</span>
+        <input id="cfgModel" class="cfginput" type="text" placeholder="比如 qwen2.5 / deepseek-chat" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="cfgrow">
+        <span class="cfglabel">API Key</span>
+        <input id="cfgKey" class="cfginput" type="password" placeholder="没有就留空" autocomplete="off" spellcheck="false">
+      </label>
+      <div class="cfgbtns">
+        <button type="button" class="cfgbtn" onclick="saveConfig()">保存</button>
+        <button type="button" class="cfgbtn" onclick="testConfig()">测试连通</button>
+        <button type="button" class="cfgbtn ghost" onclick="clearConfig()">清除</button>
+      </div>
+      <div class="cfgmsg" id="cfgmsg"></div>
+    </div>
+  </details>
+
+  <div class="menuload">
+    <button id="btnload" class="choice continue" onclick="tryLoad()">读取上次进度</button>
+  </div>
+</div>
+
+<div id="game" class="hidden">
+  <div id="topbar">
+    <span class="brand">于洪</span>
+    <span class="spacer"></span>
+    <button onclick="if(saveGame())this.textContent='已保存';">保存进度</button>
+    <button onclick="restartGame()">重开</button>
+  </div>
+  <div id="main">
+    <div id="stage">
+      <div id="stream"></div>
+      <div id="choices"></div>
+    </div>
+    <div id="side">
+      <div id="status"></div>
+    </div>
+  </div>
+</div>
+
+<div id="ending" class="hidden"></div>
+
+<script>
+/* ===== story.js ===== */
+/* ============================================================
+ *  《于洪》互动小说 —— 故事数据
+ *  依据班宇《于洪》原文 + JioNLP「悬疑推理全解析」
+ *  视角：刘阳(liu) / 郝鹏飞(hao) / 郝洁(jie) / 陈红(chen)
+ * ============================================================ */
+const L = (t) => ({ text: t });
+const S = (who, whoKey, t) => ({ who, whoKey, cls: 'said', text: t });
+const N = (t) => ({ text: t, cls: 'nar' });
+const I = (t) => ({ text: t, cls: 'inner' });
+const D = (t) => ({ text: t, cls: 'dream' });
+
+const SCENES = {};
+
+/* =====================================================================
+ *  序章 · 1998 洪水 —— 四人共用
+ * ===================================================================== */
+SCENES.prologue = {
+  title: '序章 · 一九九八年夏',
+  where: '长江大堤 · 暴雨',
+  lines: [
+    L('一九九八年的夏天，江水高出防洪堤数米。天空被雨浸洗，星星全被覆盖。'),
+    N('你们相互搀着走，由下至上，沿江而行。暴雨不停，很难看清前路。'),
+    D('至水深处，黄泥漫过来，几近胸口，简直快要窒息。'),
+    L('洪水是有温度的，内部暖热，如旋涡一般，拉着人往下坠。'),
+    I('只能在心里提醒自己：千万别倒下去，那就再也站不起来了。'),
+    N('刚开始时，前面还有人唱歌，喊着口号，很快便隐没在雷声里。四处缄默，唯有江中瀑布高耸。'),
+    { text: '那年，你是抗洪一代，抢险子弟兵。一声令下，半句废话没有，一路辉煌，全是胜仗。', cls: 'quote' },
+    { text: '可你没想到，回来之后，反而越活越回旋了。', cls: 'quote' },
+    { text: '—— 现在，二〇〇四年，冬天，沈阳。', cls: 'bridge' },
+    { text: '选一个人，进入他（她）的叙述。', cls: 'bridge' },
+  ],
+  choices: () => [
+    { tag: '刘阳', text: '我从部队复员，在家等分配，大半年没个动静', next: 'liu_1999' },
+    { tag: '郝鹏飞', text: '我在九路市场底下看自行车，叼着烟卷儿，腰里别个包儿', next: 'hao_1999' },
+    { tag: '郝洁', text: '我从大连回来，在家伺候我妈，弟弟刚退伍', next: 'jie_1999' },
+    { tag: '陈红', text: '我在汽配城有个经营点，卖摩托车油，也管着一笔钱', next: 'chen_1999' },
+  ],
+};
+
+/* =====================================================================
+ *  1999 冬 · 待业
+ * ===================================================================== */
+SCENES.liu_1999 = {
+  where: '一九九九年冬 · 于洪区的街上',
+  lines: [
+    L('你去安置办问过几次。答复永远一样：就业形势不好，这一批没单位接收，只能耐心等待，要相信政府，祖国是没有忘记你们的。'),
+    I('你听着也信服。可回到家里，思来想去，又实在是待不住。岁数不小了，还在街上晃荡，吃穿父母，没个班儿上，说不过去。'),
+    N('战友们大多走了后门，在厂里开车，或当保安。没编制，待遇也不行，勉强维持生活。'),
+    N('私下喝酒时，大家总爱抱怨：怎么说也是抗洪一代，一声令下豁得出命去，怎么回来之后反倒越活越回旋了。'),
+    D('你半夜还是会梦见。站在桥上，江水涌动，瀑布高耸，时刻准备扑袭。'),
+    N('将入冬时，你妈去九路市场买了几斤线，准备给你织件毛衣。她回来时，递你一张皱巴巴的纸条。'),
+    S('妈', 'mom', '碰见个熟人，说是你战友，记忆力挺好，当年送站时见过我，一眼就认出来了，让你有空联系他。'),
+    S('你', 'you', '叫啥。'),
+    S('妈', 'mom', '郝鹏飞。'),
+    S('你', 'you', '三眼儿啊，他干啥呢，问没。'),
+    S('妈', 'mom', '在九路市场楼下看自行车呢，叼着烟卷儿，腰里别个包儿，见我可亲了，也没收费，站那唠了半天。还说你们这一批，马上就能安置了。'),
+  ],
+  choices: () => [
+    { tag: '+ 记下', text: '把纸条收好。心里说：那人不识搭理。', next: 'liu_1999b', effects: { liuHaojie: 0 } },
+    { tag: '+ 人情', text: '三眼儿还认得出我妈，这份人情得还。去找他喝一顿。', next: 'liu_1999b' },
+    { tag: '＋钱', text: '你想起部队里一个领导，转业好几年了，听说挺有能力：李德武。要不要联系一下？', next: 'liu_call_li' },
+  ],
+};
+
+SCENES.liu_1999b = {
+  lines: [
+    N('纸条上的电话七位数。你妈说，去年电话刚升八位：原来首位是2、3、4、5的，前面加个2；首位是6、7、8、9的，在前面加个8。'),
+    I('这些你都知道。天天不上班，半导体里的报纸摘要能听好几遍。'),
+    N('十二月初，你妈从单位下岗。车间工具库六个人，就留俩名额，上面要民主，不记名投票，谁的票多谁走人。'),
+    N('结果一人一票，没办法抉择。开会时你妈自告奋勇：岁数大了，行动跟不上，先走一步；女的在世上比同岁的男的好找活儿，五十岁就能退休领劳保。'),
+    N('话没说完，整个班组哭成一片。'),
+    S('同事', 'other', '你儿子的工作落实没？'),
+    S('妈', 'mom', '等政策呢，说是过了年就安置，能进事业单位。'),
+    S('同事', 'other', '那可好，你这老有所依了。'),
+    S('妈', 'mom', '那还说啥，你们放心，我这䞍等着享福呢。'),
+    I('你知道这话是宽慰同事。但她这一下岗，工龄买断，给的都是死钱儿。你还没工作，生计犯愁。'),
+    L('一九九九年的最后一天，下了点雪，不大。街上到处宣传千禧年的到来，仿佛跨过这个世纪，就真的会有所不同。'),
+  ],
+  choices: () => [
+    { tag: '战友', text: '下午战友来电话：喊一批兵聚一聚，你想起三眼儿的号码。', next: 'liu_qianxi' },
+    { tag: '独行', text: '不去凑热闹。你坐在家里看电视，把李德武那个电话号码又摸出来看了看。', next: 'liu_call_li' },
+  ],
+};
+
+SCENES.liu_qianxi = {
+  title: '千禧年 · 最后一天',
+  where: '兴顺街 · 三眼儿的车棚',
+  lines: [
+    N('你给三眼儿打电话，七位数的号码，前面加了个2。一个女的接的。'),
+    S('你', 'you', '三眼儿在家不？'),
+    S('那边', 'other', '谁，你打错了吧。'),
+    I('你才反应过来：这外号是部队里给取的，人家有本名儿。'),
+    S('你', 'you', '这是不是郝鹏飞家，我是他以前的战友。'),
+    S('那边', 'other', '是，他没在家，上班呢。换地方了，铁西商业大厦，那边车多。'),
+    N('你骑车到兴顺街，远远望见三眼儿坐在绿棚里，棚顶上覆盖一层薄雪。他缩在里面，耷拉着脑袋，脖子上挂着手闷子，缓慢吐着白气。'),
+    N('旁边有自行车过来，他立马探起身，三步两步奔上前，撕个纸票儿，管人要钱，块儿八毛的，毛票儿也数好几遍。'),
+    N('你观察了一会儿，乐出声来。三眼儿回头一看，惊呼一声。'),
+    S('三眼儿', 'hao', '我操，你咋来了呢。'),
+    S('你', 'you', '来找你喝酒，战友聚会。'),
+    S('三眼儿', 'hao', '回来这么长时间，一次没见到，老想你了。有一次看见你妈了。'),
+    S('你', 'you', '可不咋地，青春献党，纯属白忙。'),
+    S('三眼儿', 'hao', '那也不能这么讲。不知道你，反正我还是有收获。'),
+    L('他说这话时，眼睛亮了一下。你知道那「收获」是什么——他干过一阵子侦察兵，看车这活儿，正好用得上。'),
+    S('你', 'you', '我也有，不后悔。就是社会变化太快，有点跟不上节奏。'),
+    S('三眼儿', 'hao', '现在就走，妈了个逼，今天不收费了，千禧年大酬宾，随便停去吧。'),
+    N('一行七八个人，喝到后半夜，大呼小叫，啤酒瓶子满地，还唱起歌来。'),
+    S('众人', 'other', '海风你轻轻地吹啊，海浪你轻轻地摇……'),
+    N('这些战友，各有各的道，就你还没工作，他们也跟着愁，你一言我一语，没有实质建议。'),
+    N('三眼儿开始话少，有点拘谨，几瓶下肚后也很健谈，眼睛里放着贼光。'),
+  ],
+  choices: () => [
+    { tag: '兄弟', text: '跟三眼儿说：靠别人不如靠自己，咱俩想点正事。', next: 'liu_tan' },
+    { tag: '试探', text: '装作随口一问：你还记得李德武不？他那个电话你还留着没？', next: 'liu_probe' },
+    { tag: '心事', text: '不说正事，只闷头喝酒，心里翻来覆去想着安置办那句话。', next: 'liu_tan' },
+    { tag: '不联系', text: '你把纸条折起来塞进兜里：那条路，不走。', next: 'liu_yantui', effects: { calledLi: 'no', tippedLi: 'no', liuTurn: 'out' } },
+  ],
+};
+
+SCENES.liu_probe = {
+  lines: [
+    S('你', 'you', '三眼儿，你还记得李德武不？咱们连那个老兵，转业好几年了。'),
+    N('三眼儿夹着花生米的手停在半空。'),
+    S('三眼儿', 'hao', '记得啊，怎么不记得。他后来跑货车，听说赚过也赔过。'),
+    S('你', 'you', '听说他有路子，认识人。我寻思，回头联系联系。'),
+    S('三眼儿', 'hao', '联系呗，我这儿没他电话。你找他干啥？'),
+    S('你', 'you', '就是认认亲，问候问候。'),
+    I('三眼儿看了你一会儿，眼睛里那点光暗下去了一半。'),
+    S('三眼儿', 'hao', '刘阳，咱当兵的，走正道。'),
+  ],
+  choices: () => [
+    { tag: '打岔', text: '笑一声：知道知道，我逗你玩呢。', next: 'liu_tan', effects: { liuHaojie: 0 } },
+    { tag: '硬着头皮', text: '岔过去不谈，心里那个号码反倒更清楚了。', next: 'liu_tan' },
+  ],
+};
+
+SCENES.liu_tan = {
+  lines: [
+    N('三眼儿凑过来，悄悄给你出主意。'),
+    S('三眼儿', 'hao', '他家离于洪广场很近。那边刚开发出来，住户渐多，夏天摆了不少烧烤摊位，还有打扑克的，乌乌泱泱一大片。冬天冷，人少一些，但也有，穿棉袄烤炉子喝大酒，一整半宿。'),
+    S('你', 'you', '烧烤我不会啊，没干过，扑克更不行了。'),
+    S('三眼儿', 'hao', '不让你烤。我琢磨着，咱俩出个烟摊儿。不管喝酒还是打牌，都挺费烟，一宿得好几盒。'),
+    S('三眼儿', 'hao', '到时换着来，一替一天，晚上过去。你白天上班，啥也不耽误，还不累，捡钱似的。'),
+    S('你', 'you', '也没卖过烟啊，去哪儿上货都不知道。'),
+    S('三眼儿', 'hao', '我有路子，保真，还便宜，你出人就行。就是冬天在室外杵着，那是真冷。'),
+    S('你', 'you', '这不是问题，闲着也是闲着，遭点罪不怕。'),
+    I('话是酒后的，你没太当真——可你心里，其实已经把那片广场摸过一遍了。哪家摊子喝酒，哪个老板打牌，谁兜里揣的是什么烟。'),
+  ],
+  choices: () => [
+    { tag: '一起', text: '几天后三眼儿来催：进货的钱各出一半，你出人。干！', next: 'liu_jie_first' },
+    { tag: '犹豫', text: '先答应着，心里另外那条路也在往前铺。', next: 'liu_call_li' },
+  ],
+};
+
+SCENES.liu_call_li = {
+  title: '五年前的那个电话',
+  where: '于洪广场边上的一间小平房 · 电话机',
+  lines: [
+    N('你妈下岗之后，生了一场大病。家里的账翻过来倒过去，还是缺口。'),
+    N('你找出那串号码。拨过去的时候，手指头有点抖。'),
+    S('你', 'you', '喂，是李德武吗？'),
+    S('他', 'li', '我是，你谁啊。'),
+    S('你', 'you', '我以前跟你在一个连待过，是你底下的兵。'),
+    S('他', 'li', '哦——谁啊，报个名。'),
+    I('你没讲名字。'),
+    S('你', 'you', '现在也没个正经工作，在卖烟。'),
+    S('他', 'li', '卖烟好啊，认识人。改天见个面，就在广场那边，我请你喝酒。'),
+    N('挂了电话，你在屋里站了一会儿。窗外下雪。'),
+    N('过了几天，你们在广场边上见了面。喝了几次酒，比较交心。'),
+    N('李德武跟着他哥刚做完一个案子，出手阔绰。他见你话里有话，便邀你入伙。'),
+    L('你犹豫过。三番五次。'),
+  ],
+  choices: () => [
+    { tag: '入伙', text: '你点了头。你给他指了一个人：九路市场批发白糖的业主，好打牌，总过来买烟。', next: 'liu_plan', effects: { calledLi: 'yes', tippedLi: 'full', liuTurn: 'in' } },
+    { tag: '只说一半', text: '你只说广场上谁有钱，没指名道姓，脚却已经踩在了门外。', next: 'liu_plan', effects: { calledLi: 'yes', tippedLi: 'half', liuTurn: 'in' } },
+    { tag: '退出', text: '你站起来，把酒钱压在杯子底下：这事儿我不干，别再来找我。', next: 'liu_out', effects: { calledLi: 'yes', tippedLi: 'no', liuTurn: 'out' } },
+    { tag: '举报', text: '你没喝酒，直接去了派出所。你把那个号码、那几次见面，全说了。', next: 'liu_report', effects: { calledLi: 'yes', tippedLi: 'no', liuTurn: 'reported', policeHeat: 30 } },
+  ],
+};
+
+SCENES.liu_plan = {
+  lines: [
+    N('你们定好时间。'),
+    I('卖烟这条件得天独厚：谁家有钱，谁家几点关门，谁家孩子几点放学，你比谁都清楚。'),
+    N('案发前的某一天，你骑着李德武的摩托回来。车号是三六四九四。'),
+    N('起先停在巷口，进屋后装着睡了一会儿，悄悄起了床，出门把车推回屋内，第二天一大早又骑走了。'),
+    I('你记得那天郝洁喊你，说做了个噩梦，害怕。你没顾上问她。'),
+    N('抢劫当日，李德武带着另外两个。你在外面放风，盯着广场上来来去去的人。'),
+    D('那天的风很冷。你站在电线杆子边上，像平时卖烟一样，一动不动。'),
+    N('案发了。黄海花园，一家三口，孩子还不到十岁。'),
+    N('李德武没联系过你，人间蒸发。你也没拿到那一份。'),
+  ],
+  choices: () => [
+    { tag: '沉默', text: '你把这件事压下去，压得很深，深到自己也快信了。', next: 'liu_hui', effects: { liuHaojie: 5, money: 0 } },
+    { tag: '冒名', text: '有人问你名字的时候，你说：我叫郝鹏飞，外号三眼儿。', next: 'liu_hui', effects: { borrowedName: 'yes', liuHaojie: 5 } },
+    { tag: '害怕', text: '你给三眼儿打了个电话又挂掉，什么也没说。', next: 'liu_hui', effects: { haoWanted: 5 } },
+  ],
+};
+
+SCENES.liu_hui = {
+  title: '案发之后',
+  where: '二〇〇一年四月 · 于洪广场',
+  lines: [
+    N('四月底，沈阳破了个大案，全城轰动，新闻滚动播出，群众拍手称快。'),
+    N('电视台还拍了个纪录片，全程记录审讯过程，每天一集，人性的险恶与残暴，一览无遗，比电视剧都有意思。'),
+    N('官方称之为四一〇大案，持械抢劫杀人，烧过信用社，劫过运钞车，手上十几条人命，主犯共四人，两对兄弟。'),
+    N('主事儿的是李家哥俩。哥哥李德文在线路大修段上过班，脑子好，行事缜密，案子都是他谋划；弟弟李德武以前当过兵，身法不错，也敢下狠手。'),
+    N('最后一次败露，是因为不周密——抢劫一位九路市场的业主时留下了痕迹，一举告破，进而牵出之前的连环案件。'),
+    N('遇害的是批发白糖的，经商多年，有些家底。入室行凶，一家三口，全部灭口，孩子还不到十岁。'),
+    I('这条新闻你琢磨了几天。犯案地点在黄海花园，于洪广场旁边的商品房。死去的那位男性，膀大腰圆，你是怎么看怎么眼熟。'),
+    N('后来有一天你想起来，这人以前常在扑克摊上打牌，梗着脖子，有几分派头。'),
+    N('有次他喝得比较醉，走过来问你：有没有裸体打火机。'),
+    S('那位', 'other', '打火机有，五毛钱一个。'),
+    S('那位', 'other', '要裸体的，有画面儿的那种。'),
+    S('你', 'you', '那没有。'),
+    I('他转身离开，嘴里嘟囔不停。你心说，点个火而已，怎么这么多要求。'),
+    N('你把这事讲给郝洁。她叹了口气。'),
+    S('郝洁', 'jie', '不管怎么说，这家也太惨了，孩子那么小，这伙人都该毙。'),
+    S('你', 'you', '是，那肯定没跑儿。'),
+    I('你嘴上答得干脆。手心里全是汗。'),
+  ],
+  next: 'liu_jie_first',
+  continueText: '过了几天',
+};
+
+SCENES.liu_hui2 = {
+  lines: [],
+  next: 'liu_jie_first',
+};
+
+SCENES.liu_jie_first = {
+  title: '二〇〇〇年冬 · 工人村',
+  where: '轻工街 · 三眼儿家的旧平房',
+  lines: [
+    N('三眼儿住轻工街附近，工人村的旧平房，夹在车辆厂和热力网宿舍中间，歪歪扭扭，整个区域就剩这么一趟，里出外进，一直没拆。'),
+    N('门口常年发河，冬天全是冰，不太好走。'),
+    N('他家的条件一般。他妈常年卧床，身体不好，病挺重，好几样合并症，糊涂的时候多，不咋认识人儿，脾气大。'),
+    N('他姐郝洁，大个儿，腰杆倍儿直，长得精神，有眉有眼儿，梳个五号头，像打排球的，不怎么打扮也好看。'),
+    N('当时她刚从大连回来，也没上班，在家照顾他妈。她自己的身体也虚弱，刚动完个什么手术，走道发飘。'),
+    N('你按规矩来取烟箱。她正在厨房拾掇，回头看是你。'),
+    S('郝洁', 'jie', '来了啊。吃了没？'),
+    I('你其实刚起床就来了，实在饿得不行。'),
+  ],
+  choices: () => [
+    { tag: '不客气', text: '说没吃。她给你下了一碗面条，葱花炝锅，倒上酱油，满屋一股煳香。', next: 'liu_jie_meal', effects: { liuHaojie: 8 } },
+    { tag: '客气', text: '说吃过了。取了箱子就走。', next: 'liu_yantui_end', effects: { liuHaojie: 1 } },
+    { tag: '打听', text: '问她身体咋样，手术完多久了。', next: 'liu_jie_meal', effects: { liuHaojie: 5 } },
+  ],
+};
+
+SCENES.liu_jie_meal = {
+  lines: [
+    N('她给你下了碗面条，你连吃两碗，也不见外。'),
+    N('饭后她陪你看了会儿电视。信号不好，得来回摆弄天线，屏幕上都是雪花点儿，不成人形，声音也听不真切，嗞嗞啦啦，就看个大概意思。'),
+    S('你', 'you', '等三眼儿赚钱了，让他给安个有线电视，能看好几十个台，天天放香港电影。'),
+    S('郝洁', 'jie', '指着他呢，一天到晚不着家。'),
+    S('你', 'you', '那我给你安，多大个事儿。'),
+    S('郝洁', 'jie', '那你可得说话算话。'),
+    I('这句你记下了。'),
+    N('屋里他妈又骂上了，全是脏话，一嘟囔一串儿。郝洁挺难为情，躲去厨房拾掇碗筷，水声响成一片。'),
+  ],
+  next: 'liu_yantui_end',
+  continueText: '一来二去',
+};
+
+SCENES.liu_yantui_end = {
+  lines: [
+    N('长此以往，你成了他家的常客。'),
+    N('送烟的路上捎带手买个菜，家里东西坏了，三眼儿懒，也是你帮忙收拾，烧火的劈柴都是你打的。'),
+    N('包括他妈在内，你也不嫌，拉完帮着收拾。觉得这一家过得也是不易，能帮忙就尽可量。郝洁虽然不说，但心里挺感激，你能看出来。'),
+  ],
+  next: 'liu_jie_grow',
+  continueText: '日子长了',
+};
+
+SCENES.liu_yantui = {
+  lines: [
+    N('你挂了电话，再没拨过那个号。'),
+    N('三眼儿后来问你，最近忙啥呢。你说没干啥，在家待着。'),
+    S('三眼儿', 'hao', '那咱俩搭伙？我这儿有路子，保真，还便宜。'),
+    N('于是你们各出一半钱，三眼儿联系进货渠道，你在街上打听价格。'),
+    N('刚开始生意很差。你用你妈单位以前发的皮箱装烟，折开一半，朝着街面按个放好，像摆下一盘棋，然后偎在电线杆子上，半天也没人来问。'),
+    N('后来逐渐上了道。于洪广场说大不大，说小也不小，站在同一个地方别人很难留意，需要来回不停地走动，还得张嘴推销。'),
+    N('看谁捏紧烟盒不放，立马奔上前去问问来一盒啥不。别人摆手拒绝，也别太在意——做买卖就是这样，得能拉下来脸。'),
+    I('这些道理都是三眼儿讲的。你挺佩服，他社会经验比你丰富。'),
+    N('每个月赚的不多，也能起点作用，这就知足。'),
+  ],
+  choices: () => [
+    { tag: '知足', text: '日子慢慢过吧。你在心里对自己说，够了。', next: 'liu_jie_first', effects: { liuHaojie: 2 } },
+    { tag: '不甘', text: '不够。你把李德武那个号码抄在了本子上，一直没扔。', next: 'liu_jie_first', effects: { calledLi: 'nervous' } },
+  ],
+};
+
+
+/* ===== part_liu.js ===== */
+/* ============================================================
+ *  刘阳线 · 后半程（2001–2004）
+ * ============================================================ */
+
+SCENES.liu_jie_grow = {
+  title: '一来二去 · 二〇〇〇年冬',
+  where: '工人村 · 屋里',
+  lines: [
+    N('一来二去，你发现郝洁平时不看电视，只有你去了，那台电视机才点开。专项服务，规格挺高。'),
+    N('你看电视时，郝洁总捧着本书，家里一共也没几册，来回读，书页卷了边儿也不撒手。'),
+    N('她爱看外国名著，名字没记住，硬壳，不太好翻。你问她里面讲的是啥，她也不告诉，说那样就没意思了，得自己慢慢读。'),
+    N('你偶尔也拿起来一本，应个景儿，还没看几分钟，便开始犯困——在部队待的，看字儿费劲。'),
+    N('时间一长，你就有了点跟郝洁在一起过日子的错觉。'),
+    N('送烟的路上，捎带手买个菜。家里东西坏了，三眼儿懒，也是你帮忙收拾，烧火的劈柴都是你打的。'),
+    N('包括他妈在内，你也不嫌，拉完帮着收拾。觉得这一家过得也是不易，能帮忙就尽可量。'),
+    I('郝洁虽然不说，但心里挺感激，你能看出来。'),
+  ],
+  choices: () => [
+    { tag: '过日子', text: '你把这里当成自己的家。', next: 'liu_mom_crisis', effects: { liuHaojie: 8 } },
+    { tag: '顺手', text: '你只当是顺手的人情，账还是要分的。', next: 'liu_mom_crisis', effects: { liuHaojie: 2, money: 3 } },
+    { tag: '盘算', text: '你在心里把这些人的脾气都记了一遍。', next: 'liu_mom_crisis', effects: { policeHeat: 3 } },
+  ],
+};
+
+SCENES.liu_mom_crisis = {
+  title: '二〇〇一年 · 元宵前后',
+  where: '工人村 · 医院',
+  lines: [
+    N('元宵节没到，有天晚上，他妈又犯病了。三眼儿没在家。'),
+    N('郝洁给你打的电话。你连忙赶过去。'),
+    N('进屋一看，正倒弄气儿呢，只有出的，没有进的，喘气儿声跟风箱似的，呼呼作响，胸部凹进去一大块儿，肋骨外翻。'),
+    S('你', 'you', '这得赶紧打车走。'),
+    N('郝洁攥着她妈的手，一个劲儿地哭，说啥也听不进去。'),
+    N('你跑到道边，在冰上还滑了一跤，蹭一身雪。到处都在放鞭，震耳欲聋，一年又一年，不知道有什么可庆祝的。'),
+    N('路上车很少。你拦了半天，才打到一辆拉达。人命关天，好说歹说，让司机等着。'),
+    N('你跑回屋里，把她妈往车上背，累得满头是汗。她一犯病就爱往下出溜，你老觉得使不上劲儿。'),
+    N('到医院一顿抢救。郝洁一点主意都没有，道儿都走不直。'),
+    N('凌晨，状况稳一些，你去厕所洗了把脸，抽棵烟。回来怎么想怎么不对。'),
+    S('你', 'you', '三眼儿哪儿去了呢。'),
+    S('郝洁', 'jie', '指着他呢。联系不上。'),
+    S('你', 'you', '那不能啊，他天天下了班不就去广场卖烟么。'),
+    S('郝洁', 'jie', '不知道。最近烟也没去卖，成宿不回家，没敢跟你说。'),
+    I('你陪她熬了一宿。心里却在别处：他不卖烟，那他在哪儿。'),
+    N('第二天早上，三眼儿赶来了，还是听邻居说的。灰头土脸，头发根根立着，衣服邋遢，腰包里的零钱叮当乱响。'),
+  ],
+  choices: () => [
+    { tag: '质问', text: '你问他昨晚去了哪里。他没搭理。', next: 'liu_after_crisis', effects: { haoRage: 5 } },
+    { tag: '忍住', text: '你挺来气，但这个场合不好讲出来。', next: 'liu_after_crisis', effects: {} },
+    { tag: '护着郝洁', text: '你先把郝洁拉到一边坐下。', next: 'liu_after_crisis', effects: { liuHaojie: 5 } },
+  ],
+};
+
+SCENES.liu_after_crisis = {
+  where: '清晨 · 回家',
+  lines: [
+    N('折腾了一宿，你和她筋疲力尽。危险期已过，便留下三眼儿照顾，你们回家收拾一下，晚点再来。'),
+    N('出门后你跟她说：人困马乏，咱俩在外面吃口饭。她点点头。'),
+    N('走了半天，也没找到营业的饭店。春节还没过完，都在休息。'),
+    S('郝洁', 'jie', '花那冤枉钱呢。家里吃吧，别的没有，冻饺子还剩不少。'),
+    N('刚一进屋，拉亮了管儿灯，你们都有点发愣。没了骂声，一时不太适应。'),
+    N('她坐在沙发上，没话儿，一直抹眼泪。'),
+    N('你递过去一本书，她也不看，顺手放在身侧。'),
+    S('你', 'you', '要不我去下点儿饺子，你先歇着。'),
+  ],
+  choices: () => [
+    { tag: '抱住', text: '她忽然一把把你抱住。', next: 'liu_inside', effects: { liuHaojie: 10 } },
+    { tag: '先下饺子', text: '你说：先吃，再睡一会儿。', next: 'liu_mom_death', effects: { liuHaojie: 3 } },
+    { tag: '问一句', text: '你问：三眼儿到底在忙啥。', next: 'liu_inside', effects: { liuHaojie: 5, haoRage: 5 } },
+  ],
+};
+
+SCENES.liu_inside = {
+  where: '里屋 · 没有光',
+  lines: [
+    N('她贴在背上，低头亲你的脖子。你有些激动，加上之前对她也有好感。'),
+    N('你转过头去，踮脚吻她。气喘吁吁，胡乱扯着衣服。'),
+    N('她个子高，身上比你想得还要软，并且发烫，像一株热带植物，不断生长，盘绕着你。'),
+    N('你把她的腰搂紧。她摇了摇头，攥紧你的手，把你带向里屋。'),
+    N('那里几乎没有光，举架低，棚顶歪斜。被单很潮，不断有凉意袭来。'),
+    N('她蜷起身体，咬着你的耳朵。你深吸口气，闻到了许多种味道，腐朽或者新鲜，沉重以及轻盈。'),
+    N('你望着墙壁与天花板，它们似乎正在掉落，纷纷扬扬，如同幻景。'),
+    D('你觉得是自己正一点点被展开。'),
+  ],
+  next: 'liu_mom_death',
+  continueText: '三月',
+};
+
+SCENES.liu_mom_death = {
+  title: '二〇〇一年三月二十三号',
+  where: '殡仪馆',
+  lines: [
+    N('春分刚过。老人本来恢复出院了，在家喂着饭，忽然就不行了，嘴合不上，大米粥顺着往下淌。'),
+    N('你过去时，人已经走了，关节发硬，很难摆弄，装老衣服穿得很费劲。'),
+    N('郝洁哭得上不来气。你也不好受。'),
+    N('你想起刚出院那几天，老人嘴里蹦出几个零碎的词儿——意思是说，想去医院，别有那么一天走在家里，不好，遭人厌。'),
+    L('就这么一个愿望，最后也没实现。人有时候就是这样。'),
+    N('遗体告别时，总共十人不到。哀乐的前奏还没播完。'),
+    N('三眼儿向你示意，你没太领会，后来他又摆摆手，你才明白：让你再走一遍，别冷场。'),
+    N('你再次上前鞠躬，跟他握手，然后是郝洁。这次你手刚伸过去，就被她紧紧拽住，死活不撒开，只得并肩站到一起，十指相扣。'),
+    N('快进小门时，三眼儿忽然一个俯冲，拽住灵柩不放，往地上一坐，开始干嚎。'),
+    N('两个工作人员都拉不回来，后来你上了手，硬生生拖开。'),
+    S('你', 'you', '三眼儿啊，人到时候了，该走就得走，不见得是坏事，谁也拦不住，各有命数，活人总得接着过日子啊。'),
+    L('活人的日子怎么过，也成问题。'),
+    N('有妈在，别管生没生病，那也是个家。妈一没，家也就散了。'),
+    N('老人走后，郝洁跟三眼儿的关系也处不好，鸡毛蒜皮的小事儿，老是吵架，你劝也没用——三眼儿觉得你向着她姐，久而久之跟你也有点隔阂。'),
+    N('后来这些事情你就不怎么参与了。'),
+  ],
+  choices: () => [
+    { tag: '案子', text: '四月底，电视上滚动播出四一〇大案。', next: 'liu_hui', effects: {} },
+    { tag: '烟摊', text: '那阵子，基本上只有三眼儿自己在卖烟，有一搭没一搭。', next: 'liu_slow', effects: { haoRage: 5 } },
+    { tag: '郝洁', text: '你下班后一般都过去陪郝洁。', next: 'liu_mom_death_jie', effects: { liuHaojie: 5 } },
+  ],
+};
+
+SCENES.liu_slow = {
+  where: '夜里 · 喝酒',
+  lines: [
+    N('那阵子，基本上只有三眼儿自己在卖烟，也是有一搭没一搭，进的货不见下，怎么带去的又怎么带回来。'),
+    N('还有几天，他一个人空着手出去，后半夜才回来。'),
+    S('你', 'you', '你成天到底忙活啥呢。'),
+    N('他也不说，皱着眉头，烟不停手，一抽大半盒。'),
+    N('你陪着喝两瓶啤酒。有一次快天亮时，他没头没脑地跟你说了一句。'),
+    S('三眼儿', 'hao', '以后对我姐好点儿，她命不好。'),
+    S('你', 'you', '这你放心，用不着你讲。'),
+    S('三眼儿', 'hao', '准备出趟门。老在沈阳待着，没有出路。'),
+    S('你', 'you', '去哪儿呢。'),
+    S('三眼儿', 'hao', '南方吧，看看江海，挺想念的。'),
+    S('你', 'you', '无亲无故，去那边干啥。不如留在本地，互相有个照应，回头一起做点事情，慢慢来，机会不是没有。'),
+    S('三眼儿', 'hao', '我再想想。我再想想。'),
+  ],
+  choices: () => [
+    { tag: '劝他留', text: '你说：别走，沈阳这么大，总有个活路。', next: 'liu_case_slow', effects: { haoRage: 5 } },
+    { tag: '不管', text: '你没再说。他自己选的路。', next: 'liu_case_slow', effects: {} },
+    { tag: '问清楚', text: '你追一句：出啥事了？', next: 'liu_case_slow', effects: { haoRage: 8, policeHeat: 5 } },
+  ],
+};
+
+SCENES.liu_case_slow = {
+  where: '四月底 · 电视',
+  lines: [
+    N('四月底，沈阳破了个大案。'),
+    N('电视台还拍了个纪录片，全程记录审讯过程。'),
+    N('李德文和李德武两兄弟。李德武以前当过兵，也敢下狠手。'),
+    N('三眼儿走了。跟谁都没打招呼，衣服也没带几件。'),
+    S('郝洁', 'jie', '他这是去哪儿了。'),
+    S('你', 'you', '不知道。兴许过几天就回来了。'),
+    I('你当时的想法是：他这一走，只有你跟郝洁在家里，反倒自在点儿。'),
+  ],
+  next: 'liu_bust',
+  continueText: '卖烟被抓',
+};
+
+SCENES.liu_mom_death_jie = {
+  where: '台灯下',
+  lines: [
+    N('下班后，你一般都过去陪着郝洁。'),
+    N('晚上吃完饭，她看书，你听半导体，怕打扰她，就拧到最小声，把耳朵俯在上面。'),
+    N('有时听着听着就睡着了。半夜醒来，发现郝洁在你身边，你把她搂过来，她闭着眼睛钻入怀里，头发挠着你的下巴，暖和，还有点痒。'),
+    N('她说了大连的事。你嘴上说不要紧，心里不是滋味。'),
+  ],
+  next: 'liu_case_slow',
+  continueText: '四月底',
+};
+
+SCENES.liu_bust = {
+  title: '二〇〇一年 · 小公园',
+  where: '派出所',
+  lines: [
+    N('于洪广场不让卖烟，说创立文明城市。你去了附近的小公园。'),
+    N('第一天效果还不错。第二天就赶上了警察，二话不说，直接把你扣去派出所，挂上手铐，推推搡搡。'),
+    S('警察', 'police', '有没有营业执照。'),
+    S('你', 'you', '没有。'),
+    S('警察', 'police', '知道这是犯法不。'),
+    S('你', 'you', '不知道，不懂法。'),
+    N('旁边过来个小警察，看着没你岁数大，浑身酒气，从后面给了你一脚，踹得你跪在地上。'),
+    S('小警察', 'police', '老实交代啊。'),
+    N('你当时就火了。'),
+    S('你', 'you', '操你妈的，小逼崽子，电视剧看多了吧。我保家卫国时，你在哪儿喝尿呢。'),
+    N('他薅起你头发，想往墙上撞。你举起手铐抡了过去，直接砸在面部，血一下子蹿出来。'),
+    N('好几个人扑上来把你放倒。'),
+    I('你心里说：知道，我都知道。但我他妈怎么不知道。可我的命都交出去过，轮不上你们这么对我。'),
+    N('拘了几天。派出所见你当过兵，认罪态度尚可，宽大处理。香烟全部罚没，一盒也没给留。'),
+    N('释放那天，你妈和郝洁来接你，俩人抱着你哭。'),
+    S('郝洁', 'jie', '想明白没。'),
+    S('你', 'you', '想好一半，还剩一半，回去继续琢磨。'),
+    I('你心里清楚：他们查的只是经营问题，不是那个案子。'),
+  ],
+  choices: () => [
+    { tag: '求婚', text: '你跟你妈说：问问她吧，让她搬过来住。', next: 'liu_marry', effects: { liuHaojie: 10 } },
+    { tag: '认怂', text: '你什么也不说，回家躺了三天。', next: 'liu_marry', effects: {} },
+    { tag: '较劲', text: '你还在骂：这帮小逼崽子。', next: 'liu_marry', effects: { policeHeat: 5 } },
+  ],
+};
+
+SCENES.liu_marry = {
+  title: '二〇〇一年六月 · 领证',
+  where: '饭馆 · 十桌',
+  lines: [
+    N('你妈问过她，说：这孩子心里有你，出事儿这几天，跑前跑后，眼睛一直肿着。妈没了，爸也找不到，没啥亲戚。'),
+    S('你', 'you', '那咱就结，领个证的事儿。'),
+    S('郝洁', 'jie', '我比你大两岁呢。'),
+    S('你', 'you', '我想好了，就看你。'),
+    S('郝洁', 'jie', '我早就想好了。'),
+    N('六月份领的证，八月份摆酒席。两家亲戚不多，总共不到十桌。请了个乐队，吹拉弹唱。'),
+    N('你的这帮战友也是能喝能闹，桌子都要掀翻了。'),
+    N('遗憾的是，三眼儿没有出现。好多人问起他来。'),
+    S('你', 'you', '去南方了，做买卖呢，实在赶不回来。'),
+    N('去北京的火车上，你妈拿钱让你们旅游。'),
+    N('王府井书店，她往里钻，看上书就迈不动道儿。最后只买了两册：《鹿苑》《绿阴山强盗》。'),
+    N('宾馆里，她靠在床头读书，没过一会儿开始抽泣。'),
+    S('郝洁', 'jie', '写得太好了。你想听不，我给你念。这篇叫《再见了，我的弟弟》。'),
+    S('你', 'you', '不听，不吉利。我挺想三眼儿的。'),
+    S('郝洁', 'jie', '跟他没关系。……可能也有。性格里某个地方挺像。'),
+    N('她读了一段结尾：那天早晨，大海闪着珠光，而且是黑沉沉的……我看见两个裸体的女人走出了大海。'),
+  ],
+  choices: () => [
+    { tag: '打岔', text: '你说：没太明白，但有点画面儿。', next: 'liu_barren', effects: { liuHaojie: 3 } },
+    { tag: '问下去', text: '你问：你弟到底去哪儿了，你知道不。', next: 'liu_barren', effects: { haoRage: 5 } },
+    { tag: '装睡', text: '你翻了个身，假装睡着了。', next: 'liu_barren', effects: {} },
+  ],
+};
+
+SCENES.liu_barren = {
+  title: '二〇〇二年 · 不孕',
+  where: '医院 · 走廊',
+  lines: [
+    N('回来后，郝洁说想上班。你让一个战友在轻工市场的床子让她过去帮忙。'),
+    N('刚开始她干得一般，总算错账，还丢过东西。半年过去，逐渐上手，又赶上市场全面改造，战友决定把生意停掉。'),
+    N('你和郝洁的情绪都不太好，原因是你俩本来想要个孩子，半年多过去，也没个动静。'),
+    N('去医院一检查，最后的诊断结果是：你没什么大问题，郝洁先天性输卵管狭窄，很难怀上。'),
+    I('你一直比较喜欢小孩，觉得很失落，提不起精神来。'),
+    N('有时半夜醒来，她自己悄悄抹眼泪。'),
+    N('次年春节前夕，警察找过你一次。'),
+    S('警察', 'police', '三眼儿当时什么兵种？'),
+    I('你想了想，说：普通义务兵。'),
+  ],
+  choices: () => [
+    { tag: '陪她', text: '你没告诉郝洁警察来过，只陪她看中医。满屋中药味。', next: 'liu_newyear', effects: { liuHaojie: 8 } },
+    { tag: '冷着', text: '你什么也不说。屋里越来越静。', next: 'liu_newyear', effects: { liuHaojie: -8 } },
+    { tag: '问大连', text: '你忍不住问她：大连那趟，到底怎么一回事。', next: 'liu_newyear', effects: { liuHaojie: -5 } },
+  ],
+};
+
+SCENES.liu_newyear = {
+  title: '二〇〇三年 · 大年初四',
+  where: '亲戚家 · 楼上楼下',
+  lines: [
+    N('按照惯例，新媳妇的第一个春节，亲戚长辈得给红包。'),
+    N('你跟郝洁因为怀孕的事情，心里不太痛快。你还能勉强装一装。'),
+    N('郝洁本来就不喝酒，两杯过后，脸拉下来，谁说话也不搭理，去厕所吐了一次，进屋剥橘子看电视。'),
+    S('你叔', 'other', '这媳妇，脾气大，我看你也管不住啊。'),
+    N('你笑了笑，没吱声。'),
+    N('喝到半夜，你有点醉，进屋跟郝洁说：大过节的，你在这摆脸子，给谁上眼药呢。'),
+    N('她也没好气儿。'),
+    N('你又骂了几句，越说越来气，没控制住自己，加上酒精作用，上去就抽她个嘴巴子，下手不轻。'),
+    N('她没预料到，直接被打得倒在地上，手捂着脸，大口喘气，说不上来话。'),
+    N('亲戚听声音不对，连忙过来劝。不劝还好，越说你还越来劲，从楼上追到楼下，在雪地里跑，摔了一跤。'),
+    N('亲戚拦了辆出租车，郝洁坐上就走了。'),
+    N('你妈气得不行，过来扇你。你也哭。'),
+    L('我这一肚子委屈，跟谁说呢。'),
+    N('年前单位聚餐，有人笑你。你抄着啤酒瓶子逼到墙角，那人才告诉你：郝洁在大连替个老板生儿子，没生出来，被退回来了。'),
+    I('家里困难，出去图钱，你能理解。但这么大的事情始终瞒着你，拿你当啥呢。可再一想，当时不是你自己让她别告诉你的么。'),
+  ],
+  choices: () => [
+    { tag: '道歉', text: '你去她老家门口等了一夜。门锁着。', next: 'liu_jie_return', effects: { liuHaojie: 5 } },
+    { tag: '不管', text: '你妈让你去找。沈阳这么大，能上哪儿去找。', next: 'liu_jie_return', effects: { liuHaojie: -10 } },
+    { tag: '挑明', text: '你把啤酒瓶子放下，回家等着她回来把话说清。', next: 'liu_jie_return', effects: {} },
+  ],
+};
+
+SCENES.liu_jie_return = {
+  title: '二月中旬 · 她回来了',
+  where: '骨灰堂 · 三楼',
+  lines: [
+    N('二月中旬，郝洁自己回来的。穿的还是走时候那套，看着没大变化，就是瘦了一些，脸色发乌。'),
+    N('她一进门，你心里的石头落了地。想给她道声歉，又不知道怎么说好，就当成什么也没发生过。'),
+    N('一周后，郝洁头一次主动找你。'),
+    S('郝洁', 'jie', '我想去看看她妈。快一年了，老是梦见。'),
+    N('你们起了个大早，坐公交车过去。'),
+    N('骨灰盒统一存放在三楼，她家的格子在倒数第二排，紧靠着窗台，上数第七个。'),
+    N('格子里面摆着各种物件，假的冰箱、电视、八仙桌。郝洁全部重新擦拭一遍，来回调整。'),
+    N('你靠在墙上，想起这一年里发生过的事情，觉得很不真实。'),
+    N('她低声念叨着，具体说啥听不清。你来回打量，看看隔壁都住着谁，心里开始犯嘀咕——这一排靠西面，离窗户近，常年被晒，许多纸糊的祭品都已发白，但她家格子里的那几件却很新。'),
+    N('你本想再扫一眼，她已经把玻璃门锁好，大步往外走了，也没叫你。'),
+    I('她走的时候，没有回头。'),
+  ],
+  choices: () => [
+    { tag: '跟上去', text: '你连忙跟了上去。', next: 'liu_chen', effects: {} },
+    { tag: '问一句', text: '你追上她，问：你最近身体到底怎么样。', next: 'liu_chen', effects: { liuHaojie: 3 } },
+    { tag: '站着', text: '你在原地站了一会儿，才下楼。', next: 'liu_chen', effects: { liuHaojie: -3 } },
+  ],
+};
+
+SCENES.liu_chen = {
+  title: '二〇〇三年 · 汽配城',
+  where: '经营点 · 面试',
+  lines: [
+    N('年后上班，你路过汽配城里一家经营点，看见正在招聘销售人员，卖摩托车油。'),
+    N('老板是女的，叫陈红，你早先就知道，在这一片儿挺有名。四十岁左右，个子不高，衣着讲究，浓妆艳抹。'),
+    S('陈红', 'chen', '都干过啥。'),
+    S('你', 'you', '之前也在这边上班，环境熟悉。销售没做过。再往前数，自己倒弄过烟草。'),
+    S('陈红', 'chen', '为啥想做销售呢。'),
+    S('你', 'you', '家里条件一般，听说这个比别的好赚钱。以前当过兵，爱琢磨事儿，韧劲儿在，不怕吃苦。'),
+    N('白天在公司看材料，晚上回家继续。摩托车油分SW、SF、SG、SJ。S表示汽油发动机用油，字母越靠后质量越高，W表示冬季专用。'),
+    N('你把材料带回家里，让郝洁帮着你背，来回考你。'),
+    N('五月份，陈红问你有没有驾照。你说在部队时集体考的。'),
+    S('陈红', 'chen', '有就行。雇的司机辞职开出租去了。我看你销售能力一般，不如抓紧练练车，过几天给我当司机。'),
+    N('头一天给她开车，定的八点钟到楼下，结果九点才出来。上车就说要去外地，躺在后面睡着了。'),
+    N('开到地方，将近十二点。她醒来劈头盖脸一顿骂：跟客户定好十点半开会，现在都中午了，废物，干啥啥不行。'),
+    I('你倒是不生气，只是内心难受。她说的没错，退伍这几年，你确实没做过一件像样的事情。'),
+  ],
+  choices: () => {
+    const f = G.flags;
+    if (f.calledLi === 'yes') {
+      return [
+        { tag: '忍', text: '你忍着。心里说：她的钱，是李德武转来的。', next: 'liu_affair', effects: { chenTruth: 5 } },
+        { tag: '打听', text: '你装作随口问：陈总，你前夫是干啥的。', next: 'liu_affair', effects: { chenTruth: 15 } },
+        { tag: '顶嘴', text: '你说：陈总，我不熟悉路，以后保证按时。', next: 'liu_affair', effects: {} },
+      ];
+    }
+    return [
+      { tag: '忍', text: '你忍着。工资一千七，头一次赚这么多。', next: 'liu_affair', effects: { money: 5 } },
+      { tag: '辞职', text: '你有点不想干了。可家里还在吃药。', next: 'liu_affair', effects: { money: 3 } },
+      { tag: '顶嘴', text: '你说：陈总，我不熟悉路，以后保证按时。', next: 'liu_affair', effects: {} },
+    ];
+  },
+};
+
+SCENES.liu_affair = {
+  title: '七月 · 那顿饭',
+  where: '饭馆 → 歌厅',
+  lines: [
+    N('你跟着她出了趟长差，开车到河北、河南。'),
+    N('回沈阳那天，她请你吃饭。陈红的情绪不错，那天没少喝，你陪着她，也有点醉。'),
+    N('她说了不少以前的事情：从小过得苦，跟着姑姑长大，读技校，在工厂挨欺负。'),
+    N('经人介绍认识了前夫，当兵的，对她不错，就是事业一直不太顺利。'),
+    N('婚后有了孩子，开销渐增，赶上前夫失业，常出去喝酒。忽然有一天，这人就消失了，撇下她和孩子。'),
+    I('你虽然头晕，也觉得话里有疏漏。很多事情只一两句带过，绝不会这么简单。'),
+    N('喝完酒又去唱歌。就你们俩人，嚎了大半宿，连累带闹，筋疲力尽。'),
+    N('后半夜，稀里糊涂就跟她回了家。'),
+    N('第二天早上起来，头疼欲裂。你想起了郝洁，十分愧疚，穿上衣服就走了，连个招呼也没打。'),
+    I('郝洁最近与你关系冷淡，可毕竟还有感情。至于陈红那边，你也并不讨厌。'),
+  ],
+  choices: () => [
+    { tag: '断了', text: '你回家，跟郝洁说你回来了。', next: 'liu_divorce', effects: { liuHaojie: 8, liuChenHong: -5 } },
+    { tag: '继续', text: '你开始跟家里说单位忙，常要出差。', next: 'liu_divorce', effects: { liuChenHong: 10, liuHaojie: -8 } },
+    { tag: '坦白', text: '你把这件事告诉了郝洁。', next: 'liu_tellhjie', effects: { liuHaojie: -15 } },
+  ],
+};
+
+SCENES.liu_tellhjie = {
+  lines: [
+    N('你说了。'),
+    N('郝洁坐在台灯底下，手里捧着书，没抬头。'),
+    S('郝洁', 'jie', '哦。'),
+    N('她没有哭，也没有骂。她把书合上，放在身侧。'),
+    S('郝洁', 'jie', '知道了。'),
+    I('你宁可她说点什么。'),
+  ],
+  next: 'liu_divorce',
+  continueText: '转过年',
+};
+
+SCENES.liu_divorce = {
+  title: '二〇〇三年 · 摊牌',
+  where: '家里 · 明渠的桥上',
+  lines: [
+    N('国庆期间，你妈过生日。三口人，没点几个菜。'),
+    N('你妈说：工作这么忙，顾不上家里。她这边还有点积蓄，不妨做个小买卖。'),
+    N('郝洁没说话，低头夹菜。你看她一眼，心里就明白了——这是她们商量过的主意。'),
+    N('事实上，你已经抽不出身来。原因是，陈红怀孕了。'),
+    S('陈红', 'chen', '想不想要。不要的话，她就去打掉；要的话，咱们再谈下一步。'),
+    N('你想了好几天，最终还是决定让她生下来。你实在是太喜欢孩子了。'),
+    N('孕晚期，你接连几周没回家。瞒是瞒不住了。'),
+    N('一个周六上午回到家里，郝洁没在。等她提着半口袋面包回来。'),
+    S('你', 'you', '郝洁，你先坐下，我们谈谈。'),
+    S('郝洁', 'jie', '有啥话，你就直说。我能承受。'),
+    N('你把妈也喊来卧室，扑通一声，给她俩跪了下来，磕了三个头。'),
+    N('你妈双手捂着心脏，差点没背过气去。郝洁赶紧拿来硝酸甘油。'),
+    N('直到傍晚，你妈的情绪平复一些，睡着了。'),
+    S('郝洁', 'jie', '要不要出去走走。'),
+    N('你们走在明渠的桥上，停于中途。'),
+    S('郝洁', 'jie', '辽宁二字，取啥寓意？以前辽河总发大水，岸上百姓苦不堪言，于是将这里取名辽宁，意在祈祷辽河流域永久安宁。'),
+    S('郝洁', 'jie', '沈阳，沈水之阳，居于浑河的北面。和平区以前是日租界，解放后改名为和平，祈祷太平无战。铁西区就是位于铁道西侧。'),
+    S('郝洁', 'jie', '于洪区的历史更长，本意为御洪，身先士卒，抵御滔天洪水，守卫城区。后来字不好写，改成干勾于，意思就变了——人于洪水之中。'),
+    S('郝洁', 'jie', '所以，今天你一说，我反而轻松一些。人与人之间，没那么亲密。花了不少力气，想往一起走，还是不行。'),
+    S('你', 'you', '对不起，郝洁，对不起。'),
+  ],
+  choices: () => [
+    { tag: '签字', text: '你签了字。她收拾的全是书。', next: 'liu_photo', effects: { liuHaojie: -10 } },
+    { tag: '挽留', text: '你说：要不我回家带孩子，你留下。', next: 'liu_photo', effects: { liuHaojie: 5 } },
+    { tag: '认罪', text: '你把案子的事也说了——一半。', next: 'liu_photo', effects: { toldChenRed: 'half', policeHeat: 10 } },
+  ],
+};
+
+SCENES.liu_photo = {
+  title: '二〇〇三年冬 · 康康出生',
+  where: '家里 · 壁柜',
+  lines: [
+    N('两个月后，你的儿子出生了。七斤八两，个头儿不小，哭声嘹亮，跟吹小号似的。'),
+    N('你给取了个小名儿，叫康康，祈盼身体强健，除此之外，别无所求。'),
+    N('陈红属于高龄产妇，剖腹产，术后没少遭罪。'),
+    N('收拾壁柜时，你在夹层里发现了一本影集，两个公文包。'),
+    N('影集里有陈红的艺术照，有她跟前夫的孩子的生日照，还有一家三口的合影。'),
+    N('你第一次见到她前夫的模样：戴着蛤蟆镜，个子挺高，将近一米八，烫了卷发。再往后翻，还有军装照，浓眉大眼，目光狡黠，手里端着枪。'),
+    N('这个人你看着眼熟。待你翻证件，三个字映入眼帘：李德武。'),
+    D('你一下子想到四一〇大案。李德文和李德武两兄弟。'),
+    I('算日子的话，李德武被毙有几年了。你跟陈红相处时的很多状况，也都想通了。'),
+  ],
+  choices: () => [
+    { tag: '当作没看见', text: '你把东西一一收好，放回原处。', next: 'liu_company', effects: {} },
+    { tag: '问她', text: '你拿着影集去问她。', next: 'liu_company', effects: { chenTruth: 20 } },
+    { tag: '留作筹码', text: '你抽出一张证件照，装进自己兜里。', next: 'liu_company', effects: { money: 5, chenTruth: 10 } },
+  ],
+};
+
+SCENES.liu_company = {
+  title: '二〇〇四年 · 账',
+  where: '经营点 · 办公室',
+  lines: [
+    N('陈红在家带孩子期间，公司业务大多由你处理。谈生意少不了吃饭喝酒，有时夜不归宿。'),
+    N('她回来工作，有点失落，发现很多事都是你在安排。'),
+    S('陈红', 'chen', '现在公司变成你的了。'),
+    S('你', 'you', '咱俩在一起过日子，还分这个。'),
+    S('陈红', 'chen', '今天吴姐跟我说，账不太对，出入挺大。'),
+    S('你', 'you', '你信她还是信我。她这是挑拨，对我有看法，不是一天两天了。'),
+    N('有一次吵得厉害，她说康康笨得要死，跟他姐不能比。'),
+    S('你', 'you', '笨不要紧。你不想带，我自己慢慢教，好或者坏，品行指定不差，以后不至于杀人放火。'),
+    N('陈红愣在那里，盯着你的眼睛看了半天。'),
+    S('陈红', 'chen', '你听谁说的。'),
+    S('陈红', 'chen', '没有我，你今天能有啥。'),
+    I('这话，无论什么角度，都等于是一次彻头彻尾的羞辱。'),
+  ],
+  choices: () => [
+    { tag: '挪钱', text: '你把手上的钱挪到了别处。', next: 'liu_kangkang', effects: { money: 20, chenTruth: 10, policeHeat: 15 } },
+    { tag: '收手', text: '你把账本摊在桌上，让她看。', next: 'liu_kangkang', effects: { chenLiu: 10, money: -10 } },
+    { tag: '摊牌', text: '你说：我知道影集里那个人是谁。', next: 'liu_kangkang', effects: { chenTruth: 25, toldChenRed: 'yes' } },
+  ],
+};
+
+SCENES.liu_kangkang = {
+  title: '二〇〇四年 · 医院',
+  where: '儿科病房',
+  lines: [
+    N('你摔门而出，在外面过了一宿，开车去了一个朋友那里。'),
+    N('有天夜里，陈红打了两个电话，你没接到。后来一个陌生号码，你直接挂掉，以为还是她。'),
+    N('次日酒醒，收到一条信息：康康病了，高烧好几天。昨天忽然倒地抽搐，口吐白沫，昏迷过去。大夫说可能颅脑有损伤，有耳聋的风险。让你速回沈阳。'),
+    N('你一下子慌了神，连忙返沈，一刻未停。'),
+    N('康康躺在洁白的小床上，面无表情，见到你也不讲话。'),
+    N('你极为气愤，质问陈红怎么当的这个妈。她不说话，眼神里全是恨意。'),
+    N('康康入睡后，她跟你说了公司的事。'),
+    S('陈红', 'chen', '这几天有人来查过公司，账都封了。'),
+    S('你', 'you', '封吧，随便。'),
+    S('陈红', 'chen', '你的那些事情，别以为我不知道。'),
+    S('你', 'you', '爱他妈知道不知道。'),
+    S('陈红', 'chen', '现在这局面，不是你我能说了算的。到时候怎么办，你自己想好。'),
+    S('你', 'you', '我早就想好了。反正我儿子这次要是有个三长两短，我跟你肯定没完。'),
+  ],
+  choices: () => [
+    { tag: '硬顶', text: '你摔门出去，坐在楼下花坛抽烟。', next: 'liu_hospital', effects: {} },
+    { tag: '软下来', text: '你说：康康要紧，别的事回头再说。', next: 'liu_hospital', effects: { chenLiu: 10 } },
+    { tag: '全说', text: '你把所有事都说了出来。', next: 'liu_hospital', effects: { toldChenRed: 'yes', policeHeat: 20 } },
+  ],
+};
+
+SCENES.liu_hospital = {
+  title: '二〇〇四年 · 花坛',
+  where: '医院楼下 · 半夜',
+  lines: [
+    N('半夜睡不着，你走出病房，坐在楼下的花坛旁边抽烟，连抽好几支。'),
+    N('想着公司的事情，自己的事情，想着生病的康康，头疼得不行，便躺了下去。'),
+    D('风吹过来，一时觉得眼前群星乱闪。你听到了一些喊声，有水流奔袭的声音，抗洪时战友的口号声，也有别人叫你名字的声音。'),
+    N('不知过了多久，你听见齿轮摩擦火石的清脆声音。半梦半醒之间，你感觉到有人在你身边坐了下来。'),
+    N('他摘去口罩，嘴角上扬，看着你笑。'),
+    S('你', 'you', '好久不见。'),
+    S('三眼儿', 'hao', '五年零三个月。'),
+    S('你', 'you', '我是做梦呢吧，三眼儿啊。'),
+    S('三眼儿', 'hao', '说不好。这些年啊，谁过得都像一场梦。'),
+    S('你', 'you', '三眼儿，有两下子，能找过来。'),
+    S('三眼儿', 'hao', '没想找，也是赶巧。我来办个手续。'),
+    S('你', 'you', '给谁办。'),
+    S('三眼儿', 'hao', '我姐。肝病，晚期，没几天了。移不起。今天在这儿碰上你，这都是命。'),
+    S('你', 'you', '我没照顾好你姐。'),
+    S('三眼儿', 'hao', '现在说这话，有点晚了。但得病这个事儿，赖不到你头上。还是那句，都是命。'),
+    S('你', 'you', '这几年来，你跑哪儿去了呢。'),
+    S('三眼儿', 'hao', '哪儿都在，哪儿都不在。'),
+  ],
+  choices: () => {
+    const f = G.flags;
+    const base = [
+      { tag: '让他讲', text: '你说：三眼儿，好故事，讲得不错。其余都是梦话。', next: 'liu_taopai', effects: {} },
+      { tag: '打断他', text: '你把手按在他肩上：别说了，我姐的事我管。', next: 'liu_taopai', effects: { haoRage: -5 } },
+    ];
+    if (f.calledLi === 'yes' && f.borrowedName === 'yes') {
+      base.push({ tag: '承认', text: '你说：是我。名字也是我借的。', next: 'liu_taopai', effects: { haoRage: -10, policeHeat: 15 } });
+    } else {
+      base.push({ tag: '否认', text: '你说：你发烧了吧，三眼儿，满嘴胡话。', next: 'liu_taopai', effects: { haoRage: 10 } });
+    }
+    return base;
+  },
+};
+
+SCENES.liu_taopai = {
+  where: '花坛边 · 石阶',
+  lines: [
+    S('三眼儿', 'hao', '那好。我脑子比不上你。这个事情我想了好几年。'),
+    S('三眼儿', 'hao', '从你给李德武打电话开始吧。他没问你是谁，你只说以前在同一个连待过，是他底下的兵。他问你在干啥，你说在卖烟。'),
+    S('三眼儿', 'hao', '后来相约见面，就在于洪广场附近。喝过几次酒，比较交心。他跟着他哥刚做完一个案子，出手阔绰，见你有意，便邀你入伙。'),
+    S('三眼儿', 'hao', '你也许犹豫过。三番五次后，还是提供了一点线索：九路市场批发白糖的业主，好打牌，总过来买烟。'),
+    S('三眼儿', 'hao', '也是你帮忙踩的点儿。在广场上卖烟，这个条件得天独厚。'),
+    S('三眼儿', 'hao', '抢劫当日，李德武带着另外两个。你在外面放风。案件发生后，李德武没联系过你，人间蒸发。这里面有你的一份，后来也没拿到。'),
+    S('三眼儿', 'hao', '你跟李德武说，你叫郝鹏飞，外号三眼儿。'),
+    S('三眼儿', 'hao', '当年有一次，深更半夜，你骑着李德武的摩托回来，车号三六四九四。起先停在巷口，进屋后装着睡了一会儿，悄悄起了床，出门把车推回屋内。'),
+    S('三眼儿', 'hao', '要不是你跟陈红在一起，我也想不到案子里有你。你给陈红开车，其实藏着心眼儿。李德武把钱转交给陈红，你找不到他，也没慌，便盯住了陈红。'),
+    S('三眼儿', 'hao', '东躲西藏，五年零三个月啊。'),
+    D('你一根接一根地抽烟。有那么一瞬间，夜晚忽然变作清晨，她们好像两个裸体的女人，正从大海里面走出来。'),
+    S('三眼儿', 'hao', '我上岸之后，听到三句话。第一句我妈的：早点回家，饺子包好给你留着呢。第二句你的：别乱动，信我，我带着你上岸。第三句我姐的：直起腰来，就能看见你想要看见的。'),
+    N('你转过头去，望着他。他的眼神至为恳切。恍惚之间，你甚至觉得他说的一切都是事实。'),
+    N('你沉默许久，没法辩驳，便从台阶上起身，准备离开。'),
+    N('三眼儿紧追两步，来到身侧，单手握着匕首的刃，只留锋利的尖，轻轻抵住你的颈部。'),
+    S('你', 'you', '三眼儿，到此为止吧。'),
+    S('三眼儿', 'hao', '像你说的，自己的路，还是得自己走完。你和郝洁，我跟我姐，还有咱俩之间，还剩下最后这么几步，互相伴着，走完就散，别有负担。'),
+    L('他会不会扎进去，你并不在意。你只觉疲惫不堪，无所适从。'),
+    L('你直起腰来，走出瀑布，进入海中。'),
+    L('夜幕垂落，远处楼群正如帆影，扬起一角，俯在天边的云端，缓缓移动，与你同行。'),
+  ],
+  choices: () => [
+    { tag: '走完', text: '你跟他一前一后，行在石阶上。', next: 'liu_ending_router', effects: {} },
+    { tag: '回头', text: '你回了头，说：先去医院看看你姐。', next: 'liu_ending_router', effects: { liuHaojie: 5 } },
+    { tag: '认罪', text: '你停下来，说：我去自首。', next: 'liu_ending_router', effects: { policeHeat: 30 } },
+  ],
+};
+
+SCENES.liu_ending_router = () => {
+  const f = G.flags;
+  if (f.policeHeat >= 60) {
+    showEnding({
+      num: 3,
+      summary: '天亮时警察来了。你没有跑。卷宗里写着你的名字，也写着三眼儿的名字。五年里的事，一样一样摆出来，比电视剧都有意思。',
+      quote: '各有命数，活人总得接着过日子啊。'
+    });
+  } else if (f.liuHaojie >= 60) {
+    showEnding({
+      num: 2,
+      summary: '你没有走完那段石阶。你去了医院，坐在郝洁床边，把话说了。她听完，只说了一句：水往上升，冲散就冲散吧。那天早晨，大海闪着珠光。',
+      quote: '看见两个裸体的女人走出了大海。'
+    });
+  } else {
+    showEnding({
+      num: 1,
+      summary: '你们行在石阶上，一前一后，如当年在江边，不过位置颠倒过来。亦或者被水浪吞没的是你，而浮起来的是他。在这样的夜晚里，一切悬而未决。',
+      quote: '你直起腰来，走出瀑布，进入海中。'
+    });
+  }
+};
+
+
+/* ===== part_liu_out.js ===== */
+/* ============================================================
+ *  刘阳线 · 事实分叉支线（不入伙 / 举报）
+ *  这几条路不会走向原文的后半生
+ * ============================================================ */
+
+/* ---------------- A. 退出：没有李德武的五年 ---------------- */
+SCENES.liu_out = {
+  title: '你没有入伙',
+  where: '于洪广场 · 雪夜',
+  lines: [
+    N('你把酒钱压在杯子底下就走了。李德武没拦你。'),
+    N('他坐在那儿，看着你，脸上一点表情也没有。'),
+    I('走出门的时候，你听见里面有人在笑。你不知道那笑声是不是给你的。'),
+    N('那个冬天照旧很冷。你照旧在三眼儿的烟摊上换班。'),
+    N('一九九九年最后一天，街上到处宣传千禧年，你看着满街的人，忽然想：要是那个电话没打，会不会好一些。'),
+    L('你不知道。有些事一旦伸过手，就再也收不回来了。'),
+    N('开春，你听说九路市场批白糖的那家出了事。黄海花园，一家三口。'),
+    D('新闻里滚动播出，你坐在电视前，手心一直出汗。'),
+    I('你没参与。真的没参与。可你差点就成了其中之一。'),
+  ],
+  choices: () => [
+    { tag: '去派出所', text: '你去了派出所，说自己见过李德武，喝过几次酒。', next: 'liu_out_report', effects: { policeHeat: 15 } },
+    { tag: '闭嘴', text: '你什么也没说。这件事烂在肚子里，一辈子。', next: 'liu_out_daily', effects: {} },
+    { tag: '告诉三眼儿', text: '你找到三眼儿，把这件事原原本本讲给他听。', next: 'liu_out_hao', effects: { haoRage: 10 } },
+  ],
+};
+
+SCENES.liu_out_report = {
+  lines: [
+    N('派出所的人记了笔录。你把自己知道的全说了：那个电话，那几次喝酒，那句「卖烟好啊，认识人」。'),
+    N('警察看着你，问：那你为什么没早点来。'),
+    S('你', 'you', '我怕。'),
+    N('他们让你签了字，让你随时可以来找。'),
+    N('四一〇大案告破的那天，你在烟摊上听见广播，手里的烟盒掉在地上。'),
+    N('李德武被毙了。你没被牵连，也没有人再来找你。'),
+    I('你活下来了。可是你总觉得，有人在背后看着你。'),
+  ],
+  next: 'liu_out_daily',
+  continueText: '开春',
+};
+
+SCENES.liu_out_hao = {
+  lines: [
+    N('三眼儿听完，半天没说话。他把烟叼在嘴里，火柴划了好几根都没着。'),
+    S('三眼儿', 'hao', '刘阳，你是不是疯了。那种人你也敢联系。'),
+    S('你', 'you', '我没入伙。我就喝了几次酒。'),
+    S('三眼儿', 'hao', '喝几次酒。你说的那些话，人家记着呢。'),
+    N('他站起来，在屋里走了两圈。'),
+    S('三眼儿', 'hao', '这事儿你别跟别人说。也别再提我。'),
+    I('从那以后，他看你的眼神变了。他看你的眼神，像在看一个可能出事的人。'),
+  ],
+  next: 'liu_out_daily',
+  continueText: '那之后',
+};
+
+SCENES.liu_out_daily = {
+  title: '二〇〇〇年 · 卖烟的日常',
+  where: '工人村 · 烟摊',
+  lines: [
+    N('烟摊照旧。三眼儿照旧看车，你照旧换班。'),
+    N('你开始常去他家送烟。郝洁给你下葱花炝锅的面条，你连吃两碗。'),
+    N('电视信号不好，她陪你摆弄天线，屏幕上都是雪花点儿。'),
+    S('郝洁', 'jie', '等三眼儿赚钱了，让他给安个有线电视。'),
+    S('你', 'you', '那我给你安，多大个事儿。'),
+    N('她笑了一下，没接话。'),
+    N('日子很慢。慢到你有时候会忘记自己曾经站在李德武那张桌子边上，听他说「跟着我干」。'),
+  ],
+  choices: () => [
+    { tag: '过日子', text: '你把这些当成正经日子过下去。', next: 'liu_out_grow', effects: { liuHaojie: 10 } },
+    { tag: '心里有鬼', text: '你总觉得事情没完。', next: 'liu_out_grow', effects: { policeHeat: 5 } },
+    { tag: '试探三眼儿', text: '你拐弯抹角问三眼儿：要是有人找上你，说见过李德武，你信吗。', next: 'liu_out_grow', effects: { haoRage: 8 } },
+  ],
+};
+
+SCENES.liu_out_grow = {
+  title: '二〇〇一年 · 母亲病危',
+  where: '医院',
+  lines: [
+    N('元宵没过完，郝洁给你打电话，说她妈犯病了。'),
+    N('你背人上车，拦了辆拉达，送到医院，熬了一宿。'),
+    N('三眼儿第二天才赶到，灰头土脸。郝洁瞪着他。'),
+    N('后来，郝洁在你面前哭了。她说，她一直知道弟弟在外面做了什么，只是不敢问。'),
+    N('那年三月，人走了。出殡那天，三眼儿扑到灵柩上，你把他拖开。'),
+    N('你和郝洁走到明渠的桥上。她说：于洪，本意是御洪。后来字不好写，改成干勾于，意思就变了——人于洪水之中。'),
+  ],
+  choices: () => [
+    { tag: '结婚', text: '你说：要不咱们过吧，正经过。', next: 'liu_out_marry', effects: { liuHaojie: 20 } },
+    { tag: '说清楚', text: '你把李德武那段往事也告诉了她。', next: 'liu_out_marry', effects: { liuHaojie: 10, policeHeat: 10 } },
+    { tag: '走开', text: '你说：我这样的人，不配。', next: 'liu_out_marry', effects: { liuHaojie: -10 } },
+  ],
+};
+
+SCENES.liu_out_marry = {
+  title: '二〇〇二年 · 另一条路',
+  where: '轻工街 · 家门口',
+  lines: [
+    N('那年秋天，你们领了证。'),
+    N('你在一家汽修厂找了活儿，正经上班。工资不高，但有编制，按月发。'),
+    N('三眼儿还在看车，后来去了南方一趟，回来时黑了瘦了，什么也不肯说。'),
+    N('郝洁的身体一直不好。你说：慢慢来，日子是自己的。'),
+    N('二〇〇四年冬天，你在汽修厂门口抽了根烟。天很冷，街上有人拎着白菜走过。'),
+    L('这一辈子，就这么过去了。'),
+  ],
+  choices: () => [
+    { tag: '回头', text: '你回头看了一眼来路。', next: 'liu_out_ending', effects: {} },
+    { tag: '往前走', text: '你掐了烟，进屋。', next: 'liu_out_ending', effects: {} },
+  ],
+};
+
+SCENES.liu_out_ending = () => {
+  const f = G.flags;
+  if (f.liuHaojie >= 60) {
+    showEnding({
+      num: 2,
+      summary: '你跟郝洁过了一辈子。没有大富大贵，也没有大灾大难。孩子后来没生成，你们领养了一只狗。三眼儿在南方死了，消息是五年后才传到沈阳的。你去接的骨灰，放在轻工街的老屋里。',
+      quote: '你没有走完那段石阶，而是回了家。'
+    });
+  } else {
+    showEnding({
+      num: 3,
+      summary: '你和郝洁终究没有走完。她回了大连，你在汽修厂一干就是十年。四一〇大案偶尔还被人提起，新闻里再没出现过你的名字。你活得像一块石头，谁也看不出你曾经差点站在那扇门外。',
+      quote: '各有命数，活人总得接着过日子啊。'
+    });
+  }
+};
+
+/* ---------------- B. 举报：提前结束的故事 ---------------- */
+SCENES.liu_report = {
+  title: '你去了派出所',
+  where: '派出所 · 讯问室',
+  lines: [
+    N('值班的警察是个年轻人，听完你的话，站起来，把门关上了。'),
+    S('警察', 'police', '你说的这些，有证据吗。'),
+    S('你', 'you', '有。电话号码，见面地点，他说的每一句话。'),
+    N('你把手写的几页纸递过去。'),
+    N('四一〇大案，就是从那几页纸开始的。'),
+    N('专案组找到你，问了三整天。你把自己知道的、猜的、听说的，一样一样说清楚。'),
+    N('你被放了回来，说随时配合调查。'),
+    N('一个月后，电视上滚动播出：李家兄弟落网。'),
+    L('你没有上电视。你的名字只在卷宗里出现过一次。'),
+    N('于洪广场还在。烟摊还在。三眼儿还在。郝洁还在。'),
+  ],
+  choices: () => [
+    { tag: '去找郝洁', text: '你去了三眼儿家，给郝洁带了一包线。', next: 'liu_report_jie', effects: { liuHaojie: 15 } },
+    { tag: '谁也不见', text: '你把自己关在屋里，抽了三天烟。', next: 'liu_report_alone', effects: { liuHaojie: -5 } },
+    { tag: '告诉三眼儿', text: '你把这件事告诉了郝鹏飞。', next: 'liu_report_hao', effects: { haoHaojie: 10 } },
+  ],
+};
+
+SCENES.liu_report_jie = {
+  where: '轻工街 · 屋里',
+  lines: [
+    N('三眼儿家的门半开着。郝洁正在厨房拾掇。'),
+    N('你把线放在桌上，说：天冷了，你妈该织毛衣了。'),
+    N('她愣了一下，然后笑了。'),
+    N('那天，你们一起看了电视。信号照旧不好，你摆弄了半天天线。'),
+    I('你忽然觉得，这才是正常人的日子。'),
+  ],
+  next: 'liu_report_life',
+  continueText: '那之后',
+};
+
+SCENES.liu_report_alone = {
+  lines: [
+    N('三天里，你只出门买过一次烟。'),
+    N('第四天，三眼儿来找你。他在门口站着，什么也没说，递给你一支烟。'),
+    S('三眼儿', 'hao', '我都听说了。'),
+    I('你没敢问他听说了多少。'),
+  ],
+  next: 'liu_report_life',
+  continueText: '开春',
+};
+
+SCENES.liu_report_hao = {
+  lines: [
+    N('三眼儿看着你，眼睛里的那点光没了。'),
+    S('三眼儿', 'hao', '你举报了李德武。'),
+    S('你', 'you', '他要抢的那家，一家三口，还有孩子。'),
+    N('三眼儿沉默了很久，然后把烟掐了。'),
+    S('三眼儿', 'hao', '行。你是对的。'),
+    N('他再也没提这件事。可你看见他那天晚上在巷子口坐了很久。'),
+  ],
+  next: 'liu_report_life',
+  continueText: '开春',
+};
+
+SCENES.liu_report_life = {
+  title: '二〇〇一年 · 另一种活法',
+  where: '工人村',
+  lines: [
+    N('案子破了，报纸上写着「群众举报」。没有人知道是你。'),
+    N('你继续卖烟。后来在小公园被抓过一次，拘了几天，烟全罚没。你出来时，你妈和郝洁来接你。'),
+    N('二〇〇二年，你和郝洁结了婚。酒席十桌，三眼儿坐在角落里，喝得很少。'),
+    N('二〇〇三年冬天，你们想要孩子，医生说很难。你在医院走廊坐了一夜。'),
+    N('二〇〇四年，你还是个卖烟的。街上的车越来越多，于洪广场修了新灯。'),
+    L('你没发大财。但是你睡得着觉。'),
+  ],
+  choices: () => [
+    { tag: '知足', text: '这一辈子，够了。', next: 'liu_report_ending', effects: { liuHaojie: 10 } },
+    { tag: '不甘', text: '你想起李德武说过的那些话。', next: 'liu_report_ending', effects: {} },
+    { tag: '去找三眼儿', text: '你去了铁西商场，想跟三眼儿聊聊那五年。', next: 'liu_report_hao_end', effects: { haoHaojie: 5 } },
+  ],
+};
+
+SCENES.liu_report_hao_end = {
+  title: '二〇〇四年 · 铁西商场',
+  where: '绿棚 · 薄雪',
+  lines: [
+    N('你在铁西商厦的绿棚底下找到了他。他还是坐在那儿，耷拉着脑袋，脖子上挂着手闷子。'),
+    N('他老了。头发白了一半，牙也掉了两颗。'),
+    S('你', 'you', '三眼儿，那年的事，我一直没跟你说清楚。'),
+    S('三眼儿', 'hao', '有啥说的。你现在不是挺好的吗。'),
+    S('你', 'you', '我要是不举报，你也不用在外面躲那么多年吧。'),
+    N('他愣了一下。然后笑了。'),
+    S('三眼儿', 'hao', '我躲，跟你举报没关系。我那是我自己的事。'),
+    N('你看着他，忽然觉得很累。'),
+    L('那天你们没喝酒。你帮他把绿棚的塑料布重新钉了一遍。'),
+  ],
+  next: 'liu_report_ending',
+  continueText: '傍晚',
+};
+
+SCENES.liu_report_ending = () => {
+  const f = G.flags;
+  if (f.policeHeat >= 40) {
+    showEnding({
+      num: 5,
+      summary: '千禧年的雪不大，你站在于洪广场上卖最后一盒烟。案子破了，街坊都说那是你干的，但没人真知道。你后来娶了郝洁，日子平平，一辈子没再碰过那种事。',
+      quote: '一九九九年的最后一天，雪不大。'
+    });
+  } else {
+    showEnding({
+      num: 1,
+      summary: '你去了派出所的那天，是这辈子唯一一次直起腰来。后来的人生没有大波澜，郝洁陪着你。二〇〇四年冬天，你从烟摊上起身，走出那片广场，就像走出了瀑布。',
+      quote: '你直起腰来，走出瀑布，进入海中。'
+    });
+  }
+};
+
+
+/* ===== part_hao.js ===== */
+/* ============================================================
+ *  郝鹏飞线（视角 hao）
+ * ============================================================ */
+
+SCENES.hao_1999 = {
+  title: '一九九九年冬 · 铁西商业大厦',
+  where: '兴顺街 · 绿棚底下',
+  lines: [
+    N('你在铁西商业大厦底下看自行车。绿棚顶上盖着一层薄雪，你缩在里面，耷拉着脑袋，脖子上挂着手闷子，缓慢吐着白气，分不清是睡是醒。'),
+    N('旁边有自行车过来，你立马探起身，三步两步奔上前去，撕个纸票儿，管人要钱，块儿八毛的，还挺仔细，毛票儿也数好几遍，不嫌费事儿。'),
+    N('九路市场那会儿你也在底下看车，后来换了地方，这边车多。'),
+    I('你干过一阵子侦察兵。练过越野、泅渡、野外生存，看着精瘦，其实有劲儿，浑身腱子肉。后来犯了错误，被撤回来。'),
+    I('看车这活儿，其实用的还是那套本事：谁几点来，谁几毛钱不还价，哪辆车停得歪，你一眼就看出去了。你说过「我还是有收获」，这话是真心的。'),
+    N('九月的雪还没化的时候，刘阳来了。'),
+    N('你回头一看，惊呼一声。'),
+    S('你', 'hao', '我操，你咋来了呢。'),
+    S('刘阳', 'liu', '来找你喝酒，战友聚会。'),
+    S('你', 'hao', '回来这么长时间，一次没见到，老想你了。有一次看见你妈了——在市场买线，说要给他织毛衣。'),
+    S('刘阳', 'liu', '可不咋地，青春献党，纯属白忙。'),
+    S('你', 'hao', '那也不能这么讲。不知道你，反正我还是有收获。'),
+    N('他笑了一下，没接这话。'),
+    S('你', 'hao', '现在就走，妈了个逼，今天不收费了，千禧年大酬宾，随便停去吧。'),
+  ],
+  choices: () => [
+    { tag: '兄弟', text: '喝酒时他问你有没有门路，你说认识个转业的老领导——李德武，回头见个面送点礼。', next: 'hao_li', effects: { policeHeat: 2 } },
+    { tag: '生意', text: '你说广场上摆烟摊能捡钱，一替一天，晚上过去，不耽误白天。', next: 'hao_yantui', effects: { haoHaojie: 3 } },
+    { tag: '心事', text: '你只顾喝酒，看他眼神不对，心里记下了。', next: 'hao_yantui', effects: { haoRage: 5 } },
+  ],
+};
+
+SCENES.hao_li = {
+  where: '后半夜 · 小酒馆',
+  lines: [
+    S('刘阳', 'liu', '你还记得李德武不？咱们连那个老兵。'),
+    S('你', 'hao', '记得啊。他后来跑货车，赚过也赔过。'),
+    S('刘阳', 'liu', '听说他有路子。'),
+    S('你', 'hao', '那咱回头见个面，实在不行送点礼，求他帮帮忙。'),
+    N('刘阳点点头。你不知道，他第二天就拨了那个号，而且没报名字。'),
+    I('你只是想让兄弟有个正经活儿。你没往别处想。'),
+  ],
+  next: 'hao_yantui',
+  continueText: '开春',
+};
+
+SCENES.hao_yantui = {
+  title: '二〇〇〇年 · 于洪广场的烟摊',
+  where: '于洪广场 · 电线杆子边上',
+  lines: [
+    N('你跟他搭伙卖烟，各出一半钱。你联系进货渠道，他在街上打听价格。'),
+    N('刚开始生意很差。他用他妈单位发的皮箱装烟，折开一半，朝着街面按个放好，像摆下一盘棋，然后偎在电线杆子上，半天也没人来问。'),
+    N('后来上了道。需要来回不停地走动，还得张嘴推销，看谁捏紧烟盒不放，立马奔上前去。'),
+    N('这些道理都是你讲的。他挺佩服，说你社会经验比他丰富。'),
+    N('可你慢慢看出来，他记账比你细：每个品种的进价，散盒多少钱，成条多少钱，全列清楚，一笔不落。'),
+    I('你不太在乎这些，大大咧咧。但他得算计——他说上货的钱是管他妈借的，不敢马虎。'),
+    N('有天夜里，你回家，看见院子里停着一台摩托。车号是三六四九四。'),
+    N('起先停在巷口，他装着睡了一会儿，悄悄起床，出门把车推回屋内，第二天一大早又骑走了。'),
+    I('你看着那台车，心里过了一遍：这不是他自己的车。'),
+  ],
+  choices: () => [
+    { tag: '问', text: '第二天问他：这摩托谁的？', next: 'hao_ask_moto', effects: { haoRage: 8 } },
+    { tag: '装作没看见', text: '不问了。当兵的都学过：看见了，先记下来。', next: 'hao_mom_sick', effects: { haoRage: 5, policeHeat: 5, haoTurn: 'stayed' } },
+    { tag: '告诉姐姐', text: '跟郝洁提了一嘴，说刘阳最近不太对劲。', next: 'hao_mom_sick', effects: { haoHaojie: -5, haoTurn: 'stayed' } },
+    { tag: '报警', text: '你记下车号，第二天一早去了派出所：三六四九四，这台车不是他的。', next: 'hao_report', effects: { haoTurn: 'reported', policeHeat: 40 } },
+  ],
+};
+
+SCENES.hao_ask_moto = {
+  lines: [
+    S('你', 'hao', '那摩托谁的？'),
+    S('刘阳', 'liu', '一个朋友的。借我骑骑。'),
+    S('你', 'hao', '哪个朋友？'),
+    S('刘阳', 'liu', '你不认识。'),
+    I('他回答得很快。太快了。你当过侦察兵，知道回答得越快的人，心里越想的是另一个版本。'),
+  ],
+  next: 'hao_mom_sick',
+  continueText: '过完年',
+};
+
+SCENES.hao_mom_sick = {
+  title: '二〇〇一年 · 元宵前后',
+  where: '医院 · 走廊',
+  lines: [
+    N('那晚你不在家。你在广场卖烟，一直卖到后半夜。'),
+    N('妈又犯病了。郝洁给刘阳打的电话，刘阳背着妈上车，拦了辆拉达，一路送到医院，熬了一宿。'),
+    N('第二天早上你才赶到，还是听邻居说的。灰头土脸，头发根根立着，衣服邋遢，跑进病房，腰包里的零钱叮当乱响。'),
+    N('郝洁瞪着你，也不说话，没好脸色。'),
+    S('郝洁', 'jie', '少整景儿，这时候来劲儿了。'),
+    N('你没吭声，蹲在妈床前，一副要哭还哭不出来的熊样。'),
+    I('你心里清楚：你是你妈的亲儿子。照顾你妈的，是刘阳。'),
+    S('你', 'hao', '姐，我错。'),
+  ],
+  choices: () => [
+    { tag: '道歉', text: '跟姐把话说开：以后家里的事我担，你歇着。', next: 'hao_mom_death', effects: { haoHaojie: 8 } },
+    { tag: '发难', text: '问刘阳：你昨晚哪来的钱打车？', next: 'hao_mom_death', effects: { haoRage: 8 } },
+    { tag: '沉默', text: '什么也不说，只守着妈。', next: 'hao_mom_death', effects: {} },
+  ],
+};
+
+SCENES.hao_mom_death = {
+  title: '二〇〇一年三月二十三号',
+  where: '殡仪馆 · 小门',
+  lines: [
+    N('春分刚过。妈本来恢复出院了，在家喂着饭，忽然就不行了，嘴合不上，大米粥顺着往下淌。'),
+    N('郝洁没太在意，寻思缓一会儿能好。结果躺下就再没起来。'),
+    N('人已经走了，关节发硬，很难摆弄，装老衣服穿得很费劲。'),
+    N('三眼儿家亲戚少，前面一台殡葬车，跟着一辆金杯面包，基本就坐下了。'),
+    N('遗体告别时，直系家属站一侧，等候慰问，剩下来的总共十人不到，排成一列，上前三鞠躬。'),
+    N('没两分钟，仪式结束，哀乐的前奏还没播完。众人大眼瞪小眼。'),
+    N('你向刘阳示意，他没太领会，后来你又摆摆手，他才明白——让你再走一遍，别冷场。'),
+    N('他再次鞠躬，跟你握手，然后是郝洁。这次他手刚伸过去，就被她紧紧拽住，死活不撒开，只得并肩站到一起，十指相扣。'),
+    N('快进小门时，你忽然一个俯冲，拽住灵柩不放，往地上一坐，开始干嚎，眼睛发红，饿狼似的，两个工作人员都拉不回来。'),
+    N('刘阳上了手，硬生生拖开你。'),
+    S('刘阳', 'liu', '三眼儿啊，人到时候了，该走就得走，不见得是坏事，谁也拦不住，各有命数，活人总得接着过日子啊。'),
+    L('活人的日子怎么过，也成问题。'),
+    I('有妈在，别管生没生病，那也是个家。妈一没，家也就散了。'),
+  ],
+  choices: () => [
+    { tag: '追问', text: '你开始问刘阳：案子发的那天晚上，你在哪儿？', next: 'hao_case', effects: { haoRage: 10, policeHeat: 5 } },
+    { tag: '忍着', text: '你把话咽下去。姐还在跟前。', next: 'hao_case', effects: { haoHaojie: 2 } },
+    { tag: '跟姐吵', text: '你说姐什么都向着外人。', next: 'hao_case', effects: { haoHaojie: -10 } },
+  ],
+};
+
+SCENES.hao_case = {
+  title: '二〇〇一年四月底 · 四一〇大案',
+  where: '兴工街 · 电视里',
+  lines: [
+    N('沈阳破了个大案，全城轰动。新闻滚动播出，群众拍手称快。'),
+    N('持械抢劫杀人，烧过信用社，劫过运钞车，手上十几条人命。主犯四人，两对兄弟。'),
+    N('主事儿的哥俩姓李，哥哥李德文，弟弟李德武，以前当过兵，身法不错。'),
+    N('最后那次，是抢劫一位九路市场的业主——批发白糖的，一家三口全部灭口，孩子还不到十岁。'),
+    N('警察是根据摩托车牌号抓的。二四六九六，还是九六九来着。兴工街那边逮住的，一卷一卷的钱，窝藏在棚顶夹层里，得使炉钩子刨出来。'),
+    D('你在电视前坐了很久。三六四九四。你在心里念了一遍。'),
+    N('过了几天，有人来找你问话。'),
+    S('警察', 'police', '郝鹏飞，你认识李德武？'),
+    S('你', 'hao', '认识。我哥们的战友。'),
+    S('警察', 'police', '有人指认，说你跟这案子有关系。'),
+    I('你愣在那儿。你没做过。可你确实在夜里推过那台摩托。'),
+    I('你想起刘阳。他借车那天，说你「不认识」。'),
+  ],
+  choices: () => [
+    { tag: '自首', text: '去公安局，把你知道的全说出来：摩托、李德武、刘阳那天在广场上走来走去。', next: 'hao_flee', effects: { haoWanted: 20, policeHeat: 20 } },
+    { tag: '对质', text: '先去找刘阳，当面问他到底干没干。', next: 'hao_faceoff', effects: { haoRage: 10 } },
+    { tag: '跑', text: '什么也不说，连夜走。', next: 'hao_flee', effects: { haoWanted: 30 } },
+  ],
+};
+
+SCENES.hao_faceoff = {
+  where: '工人村 · 巷口',
+  lines: [
+    S('你', 'hao', '刘阳，我问你一句话。那案子，有你没你。'),
+    S('刘阳', 'liu', '你发烧了吧，三眼儿。'),
+    S('你', 'hao', '那摩托，三六四九四。是李德武的。'),
+    S('刘阳', 'liu', '我不知道你在说啥。'),
+    S('你', 'hao', '你跟我说过，那人有钱。你还说他问你有没有裸体打火机。'),
+    N('刘阳不说话。他点了根烟，抽了两口。'),
+    S('刘阳', 'liu', '三眼儿，我姐病着。你现在说这个，是想干啥。'),
+    I('你忽然明白了：他手里有你的名字。'),
+  ],
+  choices: () => [
+    { tag: '算了', text: '你不说了。你想：我妈在的时候，是他在跟前。', next: 'hao_flee', effects: { haoRage: 15, haoWanted: 10 } },
+    { tag: '逼到底', text: '你把话说完：那我去跟公安讲。', next: 'hao_flee', effects: { haoRage: 20, haoWanted: 25 } },
+    { tag: '转身', text: '转身走了。走之前回头看了一眼院子里的烟箱。', next: 'hao_flee', effects: { haoWanted: 15 } },
+  ],
+};
+
+SCENES.hao_flee = {
+  title: '五年零三个月',
+  where: '南方 · 江边',
+  lines: [
+    N('你走了。衣服也没带几件。'),
+    N('你坐火车往南，一路看着窗外的江海。你想起当年渡轮开在江上，水往上涨，你发高烧，跌了下去，刘阳扎进水里把你拽回来。'),
+    S('你', 'hao', '别乱动，信我，我带着你上岸。'),
+    N('那句话，你跟着他干了好几年。'),
+    N('你在好几个城市落脚，干工地、卸货、看大门。有人问你名字，你说姓郝。'),
+    N('五年零三个月，你回过沈阳，不止一次。'),
+    I('每一回，你都在巷子口站着，看见刘阳骑着自行车出来，看见姐在门口晾书。'),
+  ],
+  choices: () => [
+    { tag: '见姐', text: '这一次，你敲了姐姐家的门。', next: 'hao_jie', effects: { haoHaojie: 5 } },
+    { tag: '不见', text: '你在巷口站到天亮，走了。', next: 'hao_chenhong', effects: { haoRage: 10 } },
+    { tag: '找钱', text: '你想起陈红。姐的病要钱。', next: 'hao_chenhong', effects: { haoRage: 5 } },
+  ],
+};
+
+SCENES.hao_jie = {
+  where: '轻工街 · 门口',
+  lines: [
+    S('你', 'hao', '姐。'),
+    S('郝洁', 'jie', '你还知道回来。'),
+    S('你', 'hao', '刘阳出事了。那案子，跟我没关系。'),
+    S('郝洁', 'jie', '你胡说。他对咱妈那么好，他背咱妈上医院，他熬了一宿。'),
+    S('你', 'hao', '姐，我干过侦察。我不瞎。'),
+    S('郝洁', 'jie', '你走吧。你走了这么多年，一回来就说这个。'),
+    N('她没让你进屋。门关上了，门缝里透出管儿灯的光。'),
+    I('她不信。她也不愿意信。'),
+  ],
+  choices: () => [
+    { tag: '摆证据', text: '你把摩托牌号、日期、李德武的名字，一样一样说给她听。', next: 'hao_chenhong', effects: { haoHaojie: -5, haoRage: 5 } },
+    { tag: '只叮嘱', text: '你说：姐，你身体不好，别管这些，照顾好自己。', next: 'hao_chenhong', effects: { haoHaojie: 8 } },
+    { tag: '什么都不说', text: '你在她门口站了一会儿，走了。', next: 'hao_chenhong', effects: {} },
+  ],
+};
+
+SCENES.hao_chenhong = {
+  where: '市场 · 菜摊前',
+  lines: [
+    N('姐的病查出来了。肝病，晚期。'),
+    N('你去找过一次陈红。她挺着个大肚子，在市场买菜，一脑门子汗。'),
+    N('你跟了她几天。她挑白菜，讨价还价，抹汗，一手扶着腰。'),
+    I('你想起那句话——日子难啊。'),
+    N('最后一天，她蹲下来系鞋带，肚子碍事，系了好一会儿。'),
+    I('你不落忍。怕把孩子惊到。'),
+  ],
+  choices: () => [
+    { tag: '上前', text: '你还是过去了。说：陈老板，借点钱。', next: 'hao_bathhouse', effects: { haoRage: 5 } },
+    { tag: '转身', text: '你转身走了。这一点上，你不如刘阳。或者说，谁也不如他。', next: 'hao_bathhouse', effects: { haoHaojie: 5 } },
+    { tag: '纸条', text: '你在她车筐里塞了张纸条：你前夫的钱，有人惦记着。', next: 'hao_bathhouse', effects: { chenTruth: 15, policeHeat: 5 } },
+  ],
+};
+
+SCENES.hao_bathhouse = {
+  title: '二〇〇三年 · 洗浴中心',
+  where: '包间 · 案子边',
+  lines: [
+    N('你在洗浴中心干搓澡。戴口罩，只露眉毛。'),
+    N('那天他来了。醉得很厉害，吐不出来，眼睛睁不开，喊了个套浴。'),
+    N('你搓着，手法略重。他说：轻点儿。'),
+    N('搓完正面，他翻身，看着你。'),
+    S('刘阳', 'liu', '澡堂子里还戴口罩，不怕闷啊。'),
+    S('你', 'hao', '习惯了。'),
+    S('刘阳', 'liu', '浴池要求的么，挺讲卫生。'),
+    S('你', 'hao', '嗯。'),
+    S('刘阳', 'liu', '你话挺少。以前我来这边，边搓边给我推荐各种项目。'),
+    S('你', 'hao', '新来的，不了解。'),
+    N('松腿的时候，他睡了过去。半夜澡堂里没人，只有哗哗的流水声。'),
+    N('你手里那把剃刀，刃上一点凉。'),
+    S('你', 'hao', '胡子刮不。'),
+  ],
+  choices: () => [
+    { tag: '放下', text: '你把刀放回案子上，转身走了。', next: 'hao_hospital', effects: { haoRage: 5 } },
+    { tag: '划一下', text: '刀尖轻轻抵了一下他的下颌，只留一道白印。', next: 'hao_hospital', effects: { haoRage: 15, policeHeat: 5 } },
+    { tag: '说话', text: '你摘了一半口罩，说：刘阳，是我。', next: 'hao_hospital', effects: { haoRage: 20 } },
+  ],
+};
+
+SCENES.hao_hospital = {
+  title: '二〇〇四年 · 医院楼下',
+  where: '花坛 · 半夜',
+  lines: [
+    N('姐住进了医院。你来办手续。'),
+    N('半夜，你看见他从病房里出来，坐在花坛边上抽烟，连抽好几支，头疼得不行，就躺了下去。'),
+    N('你听见他在说梦话，喊声、水声、口号声，混在一起。'),
+    N('你走过去，坐在他身边。摘去口罩，嘴角上扬，看着他笑。'),
+    N('他对着夜空说。'),
+    S('刘阳', 'liu', '好久不见。'),
+    S('你', 'hao', '五年零三个月。'),
+    S('刘阳', 'liu', '我是做梦呢吧，三眼儿啊。'),
+    S('你', 'hao', '说不好。这些年啊，谁过得都像一场梦。'),
+    S('刘阳', 'liu', '三眼儿，有两下子，能找过来。'),
+    S('你', 'hao', '没想找，也是赶巧。我来办个手续。'),
+    S('刘阳', 'liu', '给谁办。'),
+    S('你', 'hao', '我姐。肝病，晚期，没几天了。移不起。脸色跟洋蜡似的。今天在这儿碰上你，这都是命。'),
+    S('刘阳', 'liu', '我没照顾好你姐。'),
+    S('你', 'hao', '现在说这话，有点晚了。但得病这个事儿，赖不到你头上。还是那句，都是命。'),
+  ],
+  choices: () => [
+    { tag: '从头讲', text: '你从「你给李德武打电话」开始，一样一样讲给他听。', next: 'hao_taopai', effects: {} },
+    { tag: '只问一句', text: '你只说一句：摩托三六四九四，是你的主意吧。', next: 'hao_taopai', effects: {} },
+    { tag: '先沉默', text: '你先不说话，陪他坐着，看夜空。', next: 'hao_taopai', effects: { haoRage: -5 } },
+  ],
+};
+
+SCENES.hao_taopai = {
+  where: '花坛边 · 石阶',
+  lines: [
+    S('你', 'hao', '五年前，陈红跟李德武离婚，孩子跟着她。李德武之前干货车运输，赚过也赔过，离婚后买卖转交陈红。'),
+    S('你', 'hao', '李德武有赌瘾，输得一塌糊涂，亲戚借遍。你当时没找工作，你妈下岗之后生了一场大病——你给李德武打了个电话。'),
+    S('你', 'hao', '至于说了什么，我不清楚。他问你是谁，你没讲名字，只说以前在同一个连待过，是他底下的兵。他问你在干啥，你说在卖烟，没正式工作。'),
+    S('你', 'hao', '后来相约见面，可能就在于洪广场附近。喝过几次酒，比较交心。他跟着他哥刚做完一个案子，出手阔绰，见你有意，便邀你入伙。'),
+    S('你', 'hao', '你也许犹豫过。三番五次后，还是提供了一点线索：就是在九路市场批发白糖的业主，好打牌，总过来买烟。'),
+    S('你', 'hao', '于是你们定好时间，入室作案。也是你帮忙踩的点儿。在广场上卖烟，这个条件得天独厚。'),
+    S('你', 'hao', '你跟李德武说，你叫郝鹏飞，外号三眼儿。'),
+    I('刘阳一根接一根地抽，思路完全不在此处。你看见他望着夜空，像是在看海。'),
+    S('你', 'hao', '我问过我姐。出事之后，你经常回到广场，假装卖烟，顺带看看留没留下什么痕迹。我以前干过侦察，有这个敏感度。我跟我姐说过这些猜测，她不信。'),
+    S('你', 'hao', '抗洪那年，还记得吧。我走在你前面，低着头，渡轮开在江上，水往上涨。我发了高烧，体力不支，跌了下去，洪水把我卷走。你在前面，不顾阻拦，扎进水里，往深里游，硬是给我拽了回来。'),
+    S('你', 'hao', '我上岸之后，听到三句话。第一句我妈的：早点回家，饺子包好给你留着呢。第二句你的：别乱动，信我，我带着你上岸。第三句我姐的：直起腰来，就能看见你想要看见的。'),
+    L('好几年了，这个实在太难。一直没做到。'),
+  ],
+  choices: () => [
+    { tag: '刀', text: '你单手握着刀柄，只留锋利的尖，轻轻抵住他的颈部。', next: 'hao_ending_router', effects: { haoRage: 20 } },
+    { tag: '陪走', text: '你收起刀。说：剩下的几步，互相伴着走完就散，别有负担。', next: 'hao_ending_router', effects: { haoRage: -10 } },
+    { tag: '让他决定', text: '你把刀递给他：自己的路，还是得自己走完。', next: 'hao_ending_router', effects: { haoRage: -15, haoHaojie: 5 } },
+  ],
+};
+
+SCENES.hao_ending_router = () => {
+  const f = G.flags;
+  if (f.haoRage >= 55) {
+    showEnding({ num: 2, summary: '你们一前一后走在石阶上，像当年在江边，不过位置颠倒过来。刀尖没有再往里。他直起腰，走出瀑布，进入海中。你在后面跟着，什么也没有说。天亮的时候，警察在楼下找到了你们。', quote: '我上岸之后，听到三句话。第二句是：别乱动，信我，我带着你上岸。' });
+  } else if (f.haoHaojie >= 50) {
+    showEnding({ num: 1, summary: '你去了病房。姐姐拉着刘阳的手，问了最后一件她想问的事。刘阳答了，答得平平淡淡。那天傍晚，姐姐走了。你和刘阳在殡仪馆门口分了烟，谁也没有再提那五年。', quote: '直起腰来，就能看见你想要看见的。' });
+  } else {
+    showEnding({ num: 4, summary: '你松开手，让他自己走了。你在医院楼下坐了很久，楼群的窗一盏一盏亮起来。你想起姐说，那东西是帆影，缓缓移动。', quote: '夜幕垂落，远处楼群正如帆影，扬起一角。' });
+  }
+};
+
+
+/* ===== part_hao_out.js ===== */
+/* ============================================================
+ *  郝鹏飞线 · 事实分叉支线（报警 / 留下）
+ *  报警会让故事在 2000 年冬天就结束
+ * ============================================================ */
+
+SCENES.hao_report = {
+  title: '二〇〇〇年冬 · 报案',
+  where: '派出所 · 值班室',
+  lines: [
+    N('值班的民警听你说完，抬头看了你一眼。'),
+    S('警察', 'police', '一台摩托。车牌号你记得这么清楚？'),
+    S('你', 'hao', '我干过侦察。记车牌是基本功。'),
+    S('警察', 'police', '这车主是谁，你知道吗。'),
+    S('你', 'hao', '不知道。可我知道刘阳不是有摩托的人。他说是一个朋友的，又没说是谁。'),
+    N('民警把这几行字写进了值班记录。'),
+    S('警察', 'police', '留个电话。有需要找你。'),
+    N('你走出派出所的时候，天刚亮。雪地上有一行自己的脚印。'),
+    I('你不知道这一步是对是错。你只知道，你没替谁瞒着。'),
+  ],
+  choices: () => [
+    { tag: '找刘阳', text: '你回去，当面问刘阳那台车到底怎么回事。', next: 'hao_report_liu', effects: { haoRage: 10 } },
+    { tag: '什么都不说', text: '你什么也没说。照旧去铁西商厦看车。', next: 'hao_report_wait', effects: {} },
+    { tag: '告诉姐姐', text: '你去找郝洁，把报警的事说了。', next: 'hao_report_jie', effects: { haoHaojie: 10 } },
+  ],
+};
+
+SCENES.hao_report_liu = {
+  lines: [
+    S('你', 'hao', '刘阳，那台车的事，我已经报了案。'),
+    N('刘阳看着你，很久没有说话。他的脸一下子白了。'),
+    S('刘阳', 'liu', '三眼儿，你他妈疯了。'),
+    S('你', 'hao', '你要是没做亏心事，查一查不就完了。'),
+    N('他站起来，把手里的烟掐灭。'),
+    S('刘阳', 'liu', '你知不知道你害了谁。'),
+    I('那一刻，你第一次觉得这个人你认不出来了。你救过他，他也救过你。'),
+  ],
+  next: 'hao_report_wait',
+  continueText: '三个月后',
+};
+
+SCENES.hao_report_jie = {
+  lines: [
+    S('你', 'hao', '姐，我把刘阳那台摩托的事报了案。'),
+    S('郝洁', 'jie', '你为啥不先问问他本人。'),
+    S('你', 'hao', '我问了。他说是个朋友。'),
+    N('郝洁坐下来，把手里正在读的书合上。'),
+    S('郝洁', 'jie', '三眼儿，你要是弄错了，咱家以后怎么做人。'),
+    S('你', 'hao', '要是没弄错呢。'),
+    N('她没说话。'),
+  ],
+  next: 'hao_report_wait',
+  continueText: '三个月后',
+};
+
+SCENES.hao_report_wait = {
+  title: '二〇〇一年春 · 案子提前破了',
+  where: '铁西商业大厦',
+  lines: [
+    N('三个月后，报纸上登了。四一〇大案主犯李德武落网，牵出之前的连环案件。'),
+    N('专案组顺着那条摩托车的线索查下去，又找到了刘阳的名字。'),
+    N('刘阳被带走那天，你坐在绿棚里看车。他路过路口，隔着玻璃看了你一眼，什么也没说。'),
+    N('案子破了。你没有成为嫌疑人，也没有背上那五年。'),
+    N('郝洁的病，还是那个病。'),
+    N('那年春天，你们一起去看了妈，骨灰堂三楼倒数第二排。'),
+    L('有些事提前结束了。可有些事，才刚刚开始。'),
+  ],
+  choices: () => [
+    { tag: '看姐姐', text: '你陪着郝洁，在骨灰堂站了很久。', next: 'hao_report_ending', effects: { haoHaojie: 15 } },
+    { tag: '去南方', text: '你买了去南方的车票。这次没人追你。', next: 'hao_report_ending', effects: {} },
+    { tag: '继续看车', text: '你回到铁西商厦，把车棚的门拉开。', next: 'hao_report_ending', effects: { haoHaojie: 5 } },
+  ],
+};
+
+SCENES.hao_report_ending = () => {
+  const f = G.flags;
+  if (f.haoHaojie >= 55) {
+    showEnding({
+      num: 1,
+      summary: '故事在 2000 年冬天就拐了弯。刘阳进去以后，郝洁把书一本一本收起来，说：三眼儿，你没做错。后来你还在铁西商厦看车，腰包里零钱叮当响。有人问起那件案子，你只说：查清楚了。',
+      quote: '直起腰来，就能看见你想要看见的。'
+    });
+  } else {
+    showEnding({
+      num: 4,
+      summary: '你去了南方。走的时候没有通缉令，也没有追你的人。江海还是当年那个江海。你在船上站了很久，想起刘阳，想起姐姐，想起那一夜的三句话。',
+      quote: '哪儿都在，哪儿都不在。'
+    });
+  }
+};
+
+
+/* ===== part_jie.js ===== */
+/* ============================================================
+ *  郝洁线（视角 jie）
+ * ============================================================ */
+
+SCENES.jie_1999 = {
+  title: '一九九九年冬 · 轻工街',
+  where: '工人村的旧平房',
+  lines: [
+    N('这一趟房子夹在车辆厂和热力网宿舍中间，歪歪扭扭，整个区域就剩这么一趟，里出外进，一直没拆。'),
+    N('门口常年发河，冬天全是冰。'),
+    N('家里三口人：妈，你，还有弟弟。你刚从大连回来。'),
+    N('妈常年卧床，病挺重，好几样合并症，糊涂的时候多，不咋认识人儿。'),
+    I('你自己的身体也虚弱。刚动完个什么手术，走道发飘。'),
+    N('弟弟在铁西商厦底下看自行车。他退伍回来，也没上班。'),
+    N('你梳个五号头，不怎么打扮。家里一共也没几册书，来回读，书页卷了边儿也不撒手。'),
+    L('这世上没有一样东西你想占有。'),
+  ],
+  choices: () => [
+    { tag: '书', text: '你把书页抹平，心里想：人跟人之间，相互理解就是这么难。', next: 'jie_liu_first', effects: { jieWater: 3 } },
+    { tag: '弟弟', text: '你跟弟弟说：你也找点正事干，妈这边有我。', next: 'jie_liu_first', effects: { haoHaojie: 5 } },
+    { tag: '大连', text: '你想起大连。那笔钱，那张脸，你不愿意想。', next: 'jie_liu_first', effects: { jieWater: -5 } },
+  ],
+};
+
+SCENES.jie_liu_first = {
+  where: '二〇〇〇年 · 门口',
+  lines: [
+    N('刘阳来取烟箱。他是弟弟的战友，跟弟弟搭伙卖烟。'),
+    N('他来了，你给他下了一碗面条。葱花炝锅，倒上酱油，屋里屋外荡着一股煳香。'),
+    N('他连吃两碗，也不见外。'),
+    N('饭后，电视点开了。信号不好，得来回摆弄天线，屏幕上都是雪花点儿。'),
+    I('平时你不看电视。只有他来的时候，那台电视才点开。'),
+    N('你捧着书坐在一边，他看他的。屋里静着，他妈在里屋骂，一嘟囔一串儿。'),
+    S('刘阳', 'liu', '等三眼儿赚钱了，让他给安个有线电视，天天放香港电影。'),
+    S('你', 'jie', '指着他呢，一天到晚不着家。'),
+    S('刘阳', 'liu', '那我给你安，多大个事儿。'),
+    S('你', 'jie', '那你可得说话算话。'),
+  ],
+  choices: () => [
+    { tag: '记下', text: '你笑了一下，把这句话记在心里。', next: 'jie_liu_grow', effects: { jieLiu: 10 } },
+    { tag: '问弟弟', text: '你问他，弟弟在外头到底忙啥。', next: 'jie_liu_grow', effects: { jieLiu: 4 } },
+    { tag: '客气', text: '你把碗收走，说：你忙你的。', next: 'jie_liu_grow', effects: { jieLiu: 1 } },
+  ],
+};
+
+SCENES.jie_liu_grow = {
+  title: '一来二去',
+  where: '二〇〇〇年 · 冬天',
+  lines: [
+    N('他成了这家的常客。送烟的路上捎带手买个菜；家里东西坏了，弟弟懒，也是他帮忙收拾；烧火的劈柴都是他打的。'),
+    N('包括你妈在内，他也不嫌，拉完帮着收拾。'),
+    N('你虽然不说，但心里挺感激。你能看出来，他也一样。'),
+    N('时间一长，你就有了点跟一个人在一起过日子的错觉。'),
+    I('你知道这种错觉很危险。你读过不少书，书里写过这个。'),
+    N('有天下午，他又来了。你没说话，他也没说话。电视的雪花点儿一格一格往下滚。'),
+  ],
+  choices: () => [
+    { tag: '过日子', text: '你把他的碗收好，摆好筷子，像摆一盘棋。', next: 'jie_mom_crisis', effects: { jieLiu: 8, liuHaojie: 5 } },
+    { tag: '守住', text: '你提醒自己：他是弟弟的战友。', next: 'jie_mom_crisis', effects: { jieWater: -3 } },
+    { tag: '说开', text: '你问他：你以后打算怎么过。', next: 'jie_mom_crisis', effects: { jieLiu: 5 } },
+  ],
+};
+
+SCENES.jie_mom_crisis = {
+  title: '二〇〇一年 · 元宵前后',
+  where: '夜里 · 医院',
+  lines: [
+    N('妈又犯病了。气儿只有出的，没有进的，喘气儿声跟风箱似的，呼呼作响，胸部凹进去一大块儿，肋骨外翻。'),
+    N('弟弟没在家。你给刘阳打了电话。'),
+    N('他连忙赶过来，跑到道边，在冰上还滑了一跤，蹭一身雪。到处都在放鞭，震耳欲聋。'),
+    N('他拦了半天，才打到一辆拉达，好说歹说让司机等着，跑回来把妈往车上背，累得满头是汗。'),
+    N('到医院一顿抢救，各种仪器全配上。你一点主意都没有，神情恍惚，感觉随时会昏过去，道儿都走不直。'),
+    N('凌晨，状况稳一些。他去厕所洗了把脸，抽棵烟，回来问你。'),
+    S('刘阳', 'liu', '三眼儿哪儿去了呢。'),
+    S('你', 'jie', '指着他呢。联系不上。'),
+    S('刘阳', 'liu', '那不能啊，他天天下了班不就去广场卖烟么。'),
+    S('你', 'jie', '不知道。最近烟也没去卖，成宿不回家，没敢跟你说。'),
+    N('第二天早上，弟弟赶来了，还是听邻居说的。'),
+  ],
+  choices: () => [
+    { tag: '护短', text: '你瞪着他，不说话，心里还是护着弟弟的。', next: 'jie_mom_death', effects: { haoHaojie: 5 } },
+    { tag: '埋怨', text: '你说：少整景儿，这时候来劲儿了。', next: 'jie_mom_death', effects: { haoHaojie: -8 } },
+    { tag: '问', text: '你把他拉到走廊，问他这几天到底在干啥。', next: 'jie_mom_death', effects: { haoHaojie: -3, jieWater: -3 } },
+  ],
+};
+
+SCENES.jie_mom_death = {
+  title: '二〇〇一年三月二十三号',
+  where: '家里 · 殡仪馆',
+  lines: [
+    N('妈本来恢复出院了。那天在家里喂着饭，忽然就不行了，嘴合不上，大米粥顺着往下淌。'),
+    N('你没太在意，寻思缓一会儿能好。结果躺下就再没起来。'),
+    N('人已经走了，关节发硬，很难摆弄，装老衣服穿得很费劲。'),
+    N('你哭得上不来气。'),
+    N('你想起妈刚出院那几天，脑子清醒一些，嘴里蹦出几个零碎的词儿——意思是说，想去医院，别有那么一天走在家里，不好，遭人厌。'),
+    L('就这么一个愿望，最后也没实现。'),
+    N('殡仪馆里，总共十人不到。仪式还没播完哀乐。'),
+    N('刘阳上前又走了一遍，跟你握手。这次他手刚伸过去，你就紧紧拽住，死活不撒开，只得跟他并肩站着，十指相扣，看着遗体往里面推。'),
+    N('快进小门时，弟弟忽然一个俯冲，拽住灵柩不放，往地上一坐，开始干嚎。'),
+    N('刘阳把他硬生生拖开。'),
+    S('刘阳', 'liu', '三眼儿啊，人到时候了，该走就得走，不见得是坏事，谁也拦不住，各有命数，活人总得接着过日子啊。'),
+    L('活人的日子怎么过，也成问题。'),
+  ],
+  choices: () => [
+    { tag: '空屋', text: '回家收拾。拉亮管儿灯，没了骂声，一时不太适应。', next: 'jie_affair', effects: {} },
+    { tag: '守灵', text: '你在殡仪馆多待了一会儿，把纸扎收拾好。', next: 'jie_affair', effects: { jieWater: 3 } },
+    { tag: '跟弟谈', text: '你叫住弟弟：妈走了，家也散了，你往后打算怎么办。', next: 'jie_affair', effects: { haoHaojie: 3 } },
+  ],
+};
+
+SCENES.jie_affair = {
+  where: '家里 · 沙发上',
+  lines: [
+    N('你坐在沙发上，没话儿，一直抹眼泪。'),
+    N('他递过来一本书，你也不看，顺手放在身侧，接着哭。'),
+    S('刘阳', 'liu', '要不我去下点儿饺子，你先歇着，晚上还得去医院，早吃完早眯一会儿。'),
+    N('他刚起身。'),
+    I('屋里没了骂声。灯是黄的，管儿灯有点嗡嗡。'),
+    N('你忽然一把将他抱住，贴在背上。'),
+  ],
+  choices: () => [
+    { tag: '抱住', text: '低头，亲他的脖子。', next: 'jie_inside', effects: { jieLiu: 10, liuHaojie: 10 } },
+    { tag: '停住', text: '你松开了手。说：先下饺子吧，我有点冷。', next: 'jie_dalian_truth', effects: { jieWater: -5 } },
+    { tag: '说话', text: '你说：你别走。就坐一会儿。', next: 'jie_inside', effects: { jieLiu: 6 } },
+  ],
+};
+
+SCENES.jie_inside = {
+  where: '里屋 · 木床',
+  lines: [
+    N('你摇了摇头，攥紧他的手，将他带向里屋。'),
+    N('那里几乎没有光，举架低，棚顶歪斜。被单很潮，不断有凉意袭来。'),
+    N('你蜷起身体，咬着他的耳朵。他闻到了许多种味道，腐朽或者新鲜，沉重以及轻盈。'),
+    N('他望着墙壁与天花板，它们似乎正在掉落，如同幻景。外面的灯光射进来一部分，电压不稳，屋内忽明忽暗。'),
+    I('你觉得自己正一点点被展开。'),
+    N('过了些日子，他把话挑明了。'),
+    S('刘阳', 'liu', '以后这事儿少提，以前的就算了，咱们往后看。'),
+  ],
+  next: 'jie_dalian_truth',
+  continueText: '后来',
+};
+
+SCENES.jie_dalian_truth = {
+  title: '开春 · 那件掖在心里的事',
+  where: '屋里 · 台灯',
+  lines: [
+    N('他下班后一般过来陪你。晚上吃完饭，你看书，他听半导体，怕打扰你，就拧到最小声。'),
+    N('有时听着听着就睡着了，半夜醒来，你在他身边。'),
+    N('那天夜里，你说了。'),
+    S('你', 'jie', '以前我弟去当兵，妈生了病，指望不上别人，亲友借遍，也不够治疗的钱。'),
+    S('你', 'jie', '放任不顾的话，肯定说不过去。眼看着情况一天天恶化，我便跟一个朋友去了大连，在那边待过一段时间。'),
+    S('你', 'jie', '虽不得已，但也不是借口。这事儿总掖在心里，迈不过去。'),
+    S('你', 'jie', '你要是在乎，不想跟我一起过，我也能理解。'),
+    S('刘阳', 'liu', '这是啥话，以后这事儿少提，以前的就算了，咱们往后看。'),
+    N('他抱着你，不再说话。'),
+    I('他嘴上这么说。你看得见，他心里不是滋味。'),
+  ],
+  choices: () => [
+    { tag: '信他', text: '你在他怀里，什么也没再说。', next: 'jie_crack', effects: { jieLiu: 8, liuHaojie: 5 } },
+    { tag: '再问', text: '你问：你会不会有一天后悔。', next: 'jie_crack', effects: { jieWater: -5 } },
+    { tag: '自嘲', text: '你笑了笑，说：其实我早就知道，人会记着这种事的。', next: 'jie_crack', effects: { jieWater: 3 } },
+  ],
+};
+
+SCENES.jie_crack = {
+  title: '二〇〇三年 · 国庆',
+  where: '饭馆 · 婆婆生日',
+  lines: [
+    N('那阵子，基本上只有弟弟自己在卖烟，有一搭没一搭，进的货不见下。'),
+    N('你开始觉得不对劲。'),
+    N('国庆，婆婆过生日。三口人，没点几个菜，过程不太愉快。'),
+    S('婆婆', 'mom', '工作这么忙，顾不上家里，要不然回头换个活儿。她这边还有点积蓄，不妨做个小买卖，给自己干怎么也比打工强。'),
+    N('你没说话，低头夹菜，放在盘子里，也不吃。'),
+    I('这是你和婆婆商量过的主意。'),
+    N('他看了你一眼，心里就明白了。'),
+  ],
+  choices: () => [
+    { tag: '问出口', text: '你问他：你最近到底在忙啥，单位还是单位吗。', next: 'jie_daihao', effects: { jieWater: -5 } },
+    { tag: '忍着', text: '你什么也不问，把菜夹到婆婆碗里。', next: 'jie_daihao', effects: { jieWater: -3 } },
+    { tag: '提弟弟', text: '你说：我弟这么久没消息了，我心里不踏实。', next: 'jie_daihao', effects: { haoHaojie: 3 } },
+  ],
+};
+
+SCENES.jie_daihao = {
+  title: '弟弟回来了',
+  where: '夜里 · 门口',
+  lines: [
+    N('那几天你总做同一个梦。走在夜里，身后是水，一点一点不断迫近，只能朝前走，不敢回头，前面又是一片黑暗。'),
+    N('有天半夜，有人敲窗户。'),
+    S('你', 'jie', '谁。'),
+    S('郝鹏飞', 'hao', '姐，是我。'),
+    N('他瘦了，胡子拉碴，穿一件不合身的棉袄。'),
+    S('郝鹏飞', 'hao', '刘阳出事了。那案子，跟我没关系。他拿我名字去顶的。'),
+    S('你', 'jie', '你胡说。他对咱妈那么好，他背咱妈上医院。'),
+    S('郝鹏飞', 'hao', '姐，我干过侦察。那摩托，三六四九四，是李德武的。他半夜推回来的。'),
+    S('你', 'jie', '……'),
+    I('你不信。可是你在心里知道，你为什么不信。'),
+  ],
+  choices: () => [
+    { tag: '追问', text: '你把每个细节都问了一遍，问得很慢。', next: 'jie_find', effects: { jieWater: -8, haoHaojie: 3 } },
+    { tag: '赶走', text: '你说：你走，别再回来。', next: 'jie_find', effects: { haoHaojie: -10 } },
+    { tag: '答应留意', text: '你说：你先躲好。这事儿我自己看。', next: 'jie_find', effects: { haoHaojie: 5, jieWater: -3 } },
+  ],
+};
+
+SCENES.jie_find = {
+  where: '家里 · 翻箱子',
+  lines: [
+    N('他很少回家了。说是单位忙，常要出差。'),
+    N('你开始留意。'),
+    N('屋里还堆着两箱烟，很占地方。你翻了一遍，烟箱底下压着一张纸，写着几个烟名，还有一个电话号码，没署名。'),
+    N('你又想起那只皮箱。折开一半，朝着街面按个放好，像摆下一盘棋。'),
+    I('那张纸上的号码，你好像见过。在弟弟的本子上。'),
+    N('你坐在床边，手里捏着那张纸，捏了很久。'),
+  ],
+  choices: () => [
+    { tag: '报警', text: '你把纸装进兜里，去了派出所。', next: 'jie_taopai', effects: { policeHeat: 25, jieWater: -10 } },
+    { tag: '问他', text: '你把纸放回烟箱底下，等他回来当面问。', next: 'jie_taopai', effects: {} },
+    { tag: '放回去', text: '你把纸放回原处，装作什么也没看见。', next: 'jie_taopai', effects: { jieWater: -5 } },
+  ],
+};
+
+SCENES.jie_taopai = {
+  title: '二〇〇三年 · 摊牌',
+  where: '明渠的桥上',
+  lines: [
+    N('一个周六上午，他回来了。你在楼下的面包房帮忙，提着半口袋面包进屋，还很热乎。'),
+    S('刘阳', 'liu', '郝洁，你先坐下，我们谈谈。'),
+    N('他把婆婆也喊来卧室，思来想去，扑通一声，给她俩跪了下来，磕了三个头。'),
+    N('原原本本把事情讲了一遍：陈红怀孕了。'),
+    N('婆婆捂着心脏，差点没背过气去。你赶紧拿来硝酸甘油。'),
+    S('刘阳', 'liu', '对不起。'),
+    N('傍晚，婆婆的情绪平复一些，睡着了。'),
+    S('你', 'jie', '要不要出去走走。'),
+    N('你们一路往西，街旁都是树，长得茂密，枝叶在高处合拢，形成一个隐秘的通道，幽沉且昏暗。'),
+    N('居民楼被拆得只剩一半，钢筋裸露在外。'),
+    N('你们走在明渠的桥上，停于中途，河水在下方缓缓流淌。'),
+    S('你', 'jie', '辽宁二字，取啥寓意，你知道不？'),
+    S('刘阳', 'liu', '唠得挺大，这不清楚。要不还是说说咱俩的事情，有啥要求，你来提一提。'),
+    S('你', 'jie', '以前辽河总发大水，岸上百姓苦不堪言，于是将这里取名辽宁，意在祈祷辽河流域永久安宁。'),
+    S('你', 'jie', '沈阳两个字，你肯定知道，沈水之阳，居于浑河的北面。和平区以前是日租界，叫作千代田区，解放后改名为和平，祈祷太平无战。'),
+    S('你', 'jie', '铁西区就是位于铁道西侧。'),
+    S('你', 'jie', '于洪区的历史更长一些，面积也最大，几乎将市区包围，本意为御洪，身先士卒，抵御滔天洪水，守卫城区。'),
+    S('你', 'jie', '后来字不好写，改成干勾于，意思就变了——人于洪水之中。'),
+    S('你', 'jie', '忘记从哪里看来的，反正记住了。今天想起来，跟你说一说。以后这样的机会少了。'),
+  ],
+  choices: () => [
+    { tag: '早已知晓', text: '你说：其实我早就知道了。不只是这件事。', next: 'jie_leave', effects: { jieWater: 8 } },
+    { tag: '听他说', text: '你什么也不说，让他把话讲完。', next: 'jie_leave', effects: { jieWater: -3 } },
+    { tag: '离婚', text: '你说：我们离吧。', next: 'jie_leave', effects: { jieWater: 3 } },
+  ],
+};
+
+SCENES.jie_leave = {
+  where: '二〇〇三年冬 · 家里',
+  lines: [
+    S('你', 'jie', '我也总怀愧疚。过去的事情，以为真的能过去，其实不行。不是说你，我自己也很艰难，迈不动步。'),
+    S('你', 'jie', '多少年了，就困在这里。有时做梦，走在夜里，身后是水，一点一点不断迫近，只能朝前走，不敢回头，前面又是一片黑暗，什么都看不见。'),
+    S('你', 'jie', '就想放弃，等着洪水吞噬。可怎么等也不来。人要是一旦不抱希望，等待死的降临，反而很漫长，不太好熬。'),
+    S('你', 'jie', '后来你在我身边，拉着我的手，试着往前迈几步，我转头看着你，也看不清楚。人在咫尺，却又无比模糊，身边一切都是影子。'),
+    S('你', 'jie', '所以，今天你一说，我反而轻松一些。人与人之间，没那么亲密，花了不少力气，想往一起走，还是不行。'),
+    S('你', 'jie', '以前不理解，现在体会过了，就能明白一些。你照顾我这么长时间，我很感激。'),
+    S('你', 'jie', '现在时候到了，水往上升，奔涌过来，将我们冲散，避也避不过。但我想，总有一天，它会再次变得舒缓、宁静。'),
+    S('你', 'jie', '我从水中站起身来，低头看见自己，抬起头来，兴许还能看到你。倒影也好，幻景也罢，总能让我想起那么一些时刻。'),
+    S('你', 'jie', '即便之后就要沉下去，我也心满意足。'),
+    N('办完手续。婆婆劝你，你执意要走。'),
+    N('你收拾了半天东西，大多是书籍，衣服还是那几件。'),
+    N('他提议给你租房子住，你也拒绝了。走得悄无声息。'),
+  ],
+  choices: () => [
+    { tag: '留信', text: '你在桌上留了一张纸，抄了那首诗，底下是那个外国人名。', next: 'jie_last', effects: { jieWater: 5 } },
+    { tag: '不留', text: '你什么也没留。屋子空了，灯还亮着。', next: 'jie_last', effects: {} },
+    { tag: '抄在扉页', text: '你只在自己的笔记本扉页上，把那几行抄了一遍。', next: 'jie_last', effects: { jieWater: 8 } },
+  ],
+};
+
+SCENES.jie_last = {
+  title: '二〇〇四年 · 医院',
+  where: '单人病房 · 窗外下雪',
+  lines: [
+    N('这一年，你的病查出来了。肝病，晚期。'),
+    N('脸瘦得只剩一层皮，脸色跟洋蜡似的。'),
+    N('弟弟回来了，去办手续。他来办的是你的事。'),
+    N('他坐在床边，搓着大腿，什么也没说。'),
+    S('你', 'jie', '我想见刘阳一面，问他一点事情。'),
+    S('郝鹏飞', 'hao', '姐，见他干啥。'),
+    S('你', 'jie', '有些话，他来说最好。人死灯灭，我得走的时候，心里亮堂那么一下。'),
+    N('弟弟沉默了很久。'),
+    S('郝鹏飞', 'hao', '好。我去找他。'),
+    N('那天晚上，弟弟下楼去了花坛。你从窗户看见一个穿棉袄的人坐下。'),
+  ],
+  choices: () => [
+    { tag: '等', text: '你靠着枕头等。窗外的雪落得很轻。', next: 'jie_ending_router', effects: { jieWater: 8 } },
+    { tag: '叫弟回来', text: '你按铃叫护士，说算了，不见了。', next: 'jie_ending_router', effects: { haoHaojie: -5 } },
+    { tag: '下床', text: '你撑着下床，想去看看康康。', next: 'jie_ending_router', effects: { jieWater: 3 } },
+  ],
+};
+
+SCENES.jie_ending_router = () => {
+  const f = G.flags;
+  if (f.jieWater >= 65) {
+    showEnding({
+      num: 1,
+      summary: '那天早晨，大海闪着珠光，而且是黑沉沉的。你从水里站起身来，低头看见自己。抬起头，看见了帆影。你在笔记本最后一页写下：在我身上没有痛苦。',
+      quote: '直起腰来，我望见蓝色的大海和帆影。'
+    });
+  } else if (f.haoHaojie >= 50) {
+    showEnding({
+      num: 3,
+      summary: '你没有再见他。弟弟守到最后一刻，把书按顺序叠好，塞进纸箱。骨灰堂三楼倒数第二排，紧靠窗台，上数第七个。',
+      quote: '这世上没有一样东西我想占有。我知道没有一个人值得我羡慕。'
+    });
+  } else {
+    showEnding({
+      num: 4,
+      summary: '他在夜里上了楼，站在病房门口，没有进去。你们隔着玻璃看了一眼，谁也没有说话。窗外的楼群慢慢亮起来。',
+      quote: '人在咫尺，却又无比模糊。'
+    });
+  }
+};
+
+
+/* ===== part_chen.js ===== */
+/* ============================================================
+ *  陈红线（视角 chen）
+ * ============================================================ */
+
+SCENES.chen_1999 = {
+  title: '二〇〇二年 · 汽配城',
+  where: '经营点 · 二层',
+  lines: [
+    N('你的经营点上下两层，将近三百平，东西少，只几张桌椅，看着发空。'),
+    N('一个财务大姐，姓吴，六八年生人，心宽体胖，很爱说话。一个管库房的老吕。一个司机。'),
+    N('你还有一家物流公司，几年前开的，很多车辆挂靠，跑运输。你啥也不用管，每年只是帮着缴纳税费、办理道路运输证之类，旱涝保收。'),
+    I('这买卖好。一般人也干不了。方方面面，都得疏导。'),
+    N('李德武走的那年，把钱转交给你的方式，你记得清清楚楚：一卷一卷的，用炉钩子从棚顶夹层里刨出来，码在一个旧纸箱里。'),
+    N('那之后，你把它们变成了挂靠费、税费、道路运输证，变成了一笔谁也查不清的钱。'),
+    N('你四十岁左右，个子不高，衣着讲究，总是浓妆艳抹，离好几米远就能闻到香味儿。'),
+    N('这一年，你接了个新项目——卖摩托车油。跟对方关系不错，就帮忙做个代理。'),
+  ],
+  choices: () => [
+    { tag: '继续', text: '继续卖摩托油。你也不指着这个赚钱。', next: 'chen_interview', effects: { money: 3 } },
+    { tag: '换项', text: '摩托车油销量不行，你寻思改成冷冻机油。', next: 'chen_interview', effects: { money: 5 } },
+    { tag: '专心物流', text: '把经营点丢给吴姐，自己专心看物流的账。', next: 'chen_interview', effects: { money: 8, policeHeat: 2 } },
+  ],
+};
+
+SCENES.chen_interview = {
+  where: '经营点 · 二楼',
+  lines: [
+    N('有人来应聘。你抬眼一看，觉得眼熟。'),
+    N('刘阳。以前跟你前夫喝过酒的人。'),
+    S('你', 'chen', '都干过啥。'),
+    S('刘阳', 'liu', '之前也在这边上班，环境熟悉，主要是体力活儿。销售没做过。再往前数，自己倒弄过烟草，多少也算有些经验。'),
+    S('你', 'chen', '为啥想做销售呢。'),
+    S('刘阳', 'liu', '家里条件一般，听说这个比别的好赚钱。具体业务虽然不懂，但以前当过兵，爱琢磨事儿，韧劲儿在，不怕吃苦。'),
+    N('他说这话的时候眼神很稳。太稳了。'),
+    I('你知道他是谁。你也知道，李德武跟什么人打过交道。'),
+  ],
+  choices: () => [
+    { tag: '招他', text: '你说：基本工资不高，主要靠提成。三个月不达标，我也没办法。', next: 'chen_driver', effects: { chenLiu: 10, chenTurn: 'hired' } },
+    { tag: '问他', text: '你问：你跟李德武什么关系。', next: 'chen_askli', effects: { chenTruth: 20, chenTurn: 'hired' } },
+    { tag: '拒了', text: '你说不缺人，让他回去。这一门，关死了。', next: 'chen_refuse', effects: { chenLiu: -10, money: 0, chenTurn: 'fired' } },
+  ],
+};
+
+SCENES.chen_askli = {
+  lines: [
+    S('你', 'chen', '你跟李德武什么关系。'),
+    N('他愣了一下，很快。'),
+    S('刘阳', 'liu', '一起当过兵。他是我老兵。'),
+    S('你', 'chen', '他现在人呢。'),
+    S('刘阳', 'liu', '不知道。好几年没联系了。'),
+    I('他说「好几年没联系」。可你记得那年冬天，有人在你楼下打过电话，不说话，喘气。'),
+    S('你', 'chen', '那行，试用三个月。'),
+  ],
+  next: 'chen_driver',
+  continueText: '过了些日子',
+};
+
+SCENES.chen_driver = {
+  title: '二〇〇二年五月 · 第一天',
+  where: '楼下 → 外地客户',
+  lines: [
+    N('雇的司机辞职开出租去了。你问他有没有驾照。'),
+    S('刘阳', 'liu', '倒是有，在部队时集体考的，没怎么摸过车，不敢上路。'),
+    S('你', 'chen', '有就行。我看你销售能力一般，不如抓紧练练车，过几天给我当司机。'),
+    N('第一天，定的八点到楼下。你九点才出来。上车就说要去外地见客户，已经约好，让他快点开，只说了个大致方向，便躺在后面睡着了。'),
+    N('醒来时将近十二点。'),
+    N('你揉揉眼睛，劈头盖脸就是一顿骂。'),
+    S('你', 'chen', '跟客户定好了时间，十点半开会，结果现在都中午了！废物，干啥啥不行。'),
+    N('他没生气，只是解释：很长时间没开过车，不太熟悉，以后保证按时。'),
+    I('你摔门下车，进去谈事情。你在里面待了几个小时。'),
+    N('晚上七点，你跟着几个穿西服的出来，说去饭店吃海鲜。'),
+    N('半夜十一点多，饭局才结束。你连路都走不稳，非要跟人挨个拥抱告别。'),
+    N('他扶你上车。没开到一半，你全吐车上了。'),
+  ],
+  choices: () => [
+    { tag: '继续骂', text: '第二天你照旧挑他的毛病。', next: 'chen_trip', effects: { chenLiu: -3 } },
+    { tag: '加工钱', text: '你给他开了一千七百块。他吓了一跳。', next: 'chen_trip', effects: { chenLiu: 10, money: -5 } },
+    { tag: '冷着', text: '你半个月不跟他多说话，自己反省自己。', next: 'chen_trip', effects: { chenTruth: 5 } },
+  ],
+};
+
+SCENES.chen_trip = {
+  title: '二〇〇三年七月 · 河北河南',
+  where: '公路 · 厂家',
+  lines: [
+    N('跑几个厂家。摩托车油销量不行，你准备换个项目。'),
+    N('你一边听他抱怨，不，他一边听你抱怨：谁家说话不算数，谁家要多少回扣。'),
+    N('有时你也谈谈自己的事。亲戚管你借了多少钱，孩子在寄宿学校的情况。'),
+    N('聊得多了，他也帮着出点主意。'),
+    I('这个人别的不行，考虑事情往往比较周到，愿意站在别人的立场上看。'),
+    I('当局者迷。跳出来一步再看，没那么复杂。'),
+    N('回沈阳那天，你请他吃饭，犒劳一下。他推辞，你坚持。'),
+    N('饭桌上你说了不少以前的事。'),
+    S('你', 'chen', '从小过得苦，没妈，爸也不怎么管，跟着姑姑长大的。姑父睁眼闭眼看不上我。'),
+    S('你', 'chen', '读了个技校，在工厂上班，也总挨欺负，手脚笨，不受待见。'),
+    S('你', 'chen', '经人介绍认识了前夫。当兵的，对我不错，就是事业方面一直不太顺利。'),
+    S('你', 'chen', '婚后有了孩子，开销渐增，赶上前夫失业，常出去喝酒，为此两人吵过多次。'),
+    S('你', 'chen', '忽然有一天，这人就消失了，了无痕迹，撇下我和孩子，无依无靠，一步一步走到今天。'),
+    I('你当然没说完。很多事情只一两句带过，绝不会这么简单。'),
+  ],
+  choices: () => [
+    { tag: '全盘', text: '你借着酒，把能说的都说了。', next: 'chen_night', effects: { chenLiu: 10 } },
+    { tag: '一半', text: '你停下，转了个话头：这酒不错。', next: 'chen_night', effects: {} },
+    { tag: '试探', text: '你忽然问：你知不知道李德武当年抢过钱。', next: 'chen_night', effects: { chenTruth: 20, chenLiu: -5 } },
+  ],
+};
+
+SCENES.chen_night = {
+  where: '后半夜 · 你的家',
+  lines: [
+    N('喝完酒又去唱歌。就你们俩人，一首接着一首，嚎了大半宿，连跳带闹。'),
+    N('后半夜，稀里糊涂就回了你家。'),
+    N('第二天早上，他起来头疼欲裂，穿上衣服就走了，连个招呼也没打。'),
+    N('你坐在餐桌前，看着他留下的半杯水。'),
+    I('他不是为了你。你早就知道。他要的是另外一样东西。'),
+    N('可你还是把话说软了。再去上班时，你说话声音轻，笑脸也多了一些。'),
+  ],
+  choices: () => [
+    { tag: '继续', text: '跑个手续、送一笔款，你都放心让他去。', next: 'chen_pregnant', effects: { chenLiu: 10, money: -8 } },
+    { tag: '收紧', text: '你把款子的事收回自己手里。', next: 'chen_pregnant', effects: { chenTruth: 10 } },
+    { tag: '当面问', text: '你问他：你图我什么。', next: 'chen_pregnant', effects: { chenTruth: 10, chenLiu: -5 } },
+  ],
+};
+
+SCENES.chen_pregnant = {
+  title: '转过年 · 怀孕',
+  where: '家里 · 客厅',
+  lines: [
+    N('你怀孕了。'),
+    N('那天他坐在沙发上，你看着他。'),
+    S('你', 'chen', '想不想要。不要的话，我就去打掉。要的话，咱们再谈下一步。'),
+    N('他过了好几天才回话。'),
+    S('刘阳', 'liu', '要。'),
+    N('你渐渐显怀，行动不便。公司方面的业务，大多由他处理，每天去跟厂家对接，与客户交涉。'),
+    N('你岁数有点大，一切谨慎为好。'),
+    I('你知道他要的是什么。你给的，是一个月的工钱，和一个不查账的位置。'),
+  ],
+  choices: () => [
+    { tag: '逼他负责', text: '你说：孩子生下来没爸，我肯定不答应。', next: 'chen_accounts', effects: { chenLiu: -5 } },
+    { tag: '自己去', text: '你没等他答话，已经约了医院。', next: 'chen_accounts', effects: { chenLiu: -15, money: 5 } },
+    { tag: '让他定', text: '你说：你自己想清楚。', next: 'chen_accounts', effects: { chenLiu: 5 } },
+  ],
+};
+
+SCENES.chen_accounts = {
+  title: '二〇〇三年秋 · 回公司',
+  where: '经营点 · 办公室',
+  lines: [
+    N('孩子周岁，你的身体恢复得差不多了，打算回来工作。'),
+    N('一进门，你就有点失落。很多事都是他在安排。'),
+    S('你', 'chen', '现在公司变成你的了。'),
+    S('刘阳', 'liu', '咱俩在一起过日子，还分这个。'),
+    N('吴姐把你拉到一边。'),
+    S('吴姐', 'wu', '账不太对，出入挺大。'),
+    S('刘阳', 'liu', '你信她还是信我。她这是挑拨，对我有看法，不是一天两天了。'),
+    S('你', 'chen', '我看未必。'),
+    S('刘阳', 'liu', '陈红，你要是觉得这里面有问题，我回家带孩子，你来经营，我没所谓，正合心意。'),
+  ],
+  choices: () => [
+    { tag: '查账', text: '你把吴姐叫进屋，一页一页对。', next: 'chen_check', effects: { chenTruth: 15, policeHeat: 10 } },
+    { tag: '试探', text: '你先不说，只看他几天。', next: 'chen_check', effects: { chenTruth: 8 } },
+    { tag: '装没事', text: '你说：也不是这意思。', next: 'chen_check', effects: { money: -10 } },
+  ],
+};
+
+SCENES.chen_check = {
+  title: '二〇〇四年 · 那一晚',
+  where: '医院 · 儿科病房',
+  lines: [
+    N('有人来查过公司。账都封了。'),
+    N('同一天夜里，康康病了。高烧好几天，开始还很有精神，就在家吃吃药。'),
+    N('昨天忽然倒地抽搐，口吐白沫，昏迷过去。'),
+    N('大夫说状况不好，可能颅脑有损伤，有耳聋的风险。'),
+    N('你给他打电话。两个没接。后来换了一个陌生号码，他直接挂掉，以为还是你。'),
+    N('次日你发了条信息，说康康病了，让他速回沈阳。'),
+    N('他赶回来，一刻未停，直接奔到医院。'),
+    N('康康躺在洁白的小床上，面无表情，见到他也不讲话。'),
+    N('他极气愤，质问你。'),
+    S('刘阳', 'liu', '你怎么当的这个妈。'),
+    N('你不说话。'),
+    I('你的眼神里全是恨意。'),
+  ],
+  choices: () => [
+    { tag: '抖底', text: '你说：李德武的钱，你也拿过吧。', next: 'chen_faceoff', effects: { chenTruth: 25 } },
+    { tag: '说账', text: '你说：这几天有人来查过公司，咱俩都脱不了干系。', next: 'chen_faceoff', effects: { policeHeat: 10 } },
+    { tag: '沉默', text: '你什么也不说，只看着康康。', next: 'chen_faceoff', effects: {} },
+  ],
+};
+
+SCENES.chen_faceoff = {
+  where: '病房 · 半夜',
+  lines: [
+    N('康康入睡后，你说了。'),
+    S('你', 'chen', '这几天有人来查过公司，账都封了。'),
+    S('刘阳', 'liu', '封吧，随便。'),
+    S('你', 'chen', '咱俩都脱不了干系。'),
+    S('刘阳', 'liu', '像我在乎似的。'),
+    S('你', 'chen', '你的那些事情，别以为我不知道。'),
+    S('刘阳', 'liu', '爱他妈知道不知道。'),
+    S('你', 'chen', '现在这局面，不是你我能说了算的。到时候怎么办，你自己想好。'),
+    S('刘阳', 'liu', '我早就想好了，不用你操心，无所谓。反正我儿子这次要是有个三长两短，我跟你肯定没完。'),
+    N('他摔门出去了。'),
+  ],
+  choices: () => [
+    { tag: '报警', text: '你拿起电话，把你知道的全说了。', next: 'chen_ending_router', effects: { policeHeat: 30, chenTruth: 20 } },
+    { tag: '等', text: '你抱着康康，等他回来。', next: 'chen_ending_router', effects: { chenLiu: 5 } },
+    { tag: '跑', text: '你把能取的钱取出来，带着康康离开了沈阳。', next: 'chen_ending_router', effects: { money: 10, chenTruth: 10 } },
+  ],
+};
+
+SCENES.chen_ending_router = () => {
+  const f = G.flags;
+  if (f.chenTruth >= 50) {
+    showEnding({
+      num: 3,
+      summary: '你把事情交了出去。查账的人来了又走，封条换了新的一层。康康出院那天听不见你喊他，只是笑着抓你的手指。物流公司挂靠的车一辆一辆被扣。你站在院子里，忽然觉得这地方从没有过一样是你的东西。',
+      quote: '没有我，你今天能有啥。'
+    });
+  } else if (f.money >= 40) {
+    showEnding({
+      num: 4,
+      summary: '你把钱挪到了一处谁也不知道的地方。沈阳越来越冷，你把康康送去了寄宿学校。晚上你一个人坐在三百平的经营点里，听楼下的车声。那些钱像水，一直往上漫。',
+      quote: '水往上升，奔涌过来，将我们冲散，避也避不过。'
+    });
+  } else {
+    showEnding({
+      num: 2,
+      summary: '你在病房守到天亮。他坐在楼下花坛边上，和一个戴口罩的人并排坐着。你在楼上看着，没有下去。后来听说那天夜里出了事。康康的耳朵没恢复。',
+      quote: '两个人都不肯先放手。'
+    });
+  }
+};
+
+
+/* ===== part_chen_out.js ===== */
+/* ============================================================
+ *  陈红线 · 事实分叉支线（不招刘阳）
+ *  这个人没进门，整条悲剧链就不会发生
+ * ============================================================ */
+
+SCENES.chen_refuse = {
+  title: '二〇〇三年 · 门关上了',
+  where: '经营点 · 楼下',
+  lines: [
+    N('你说不缺人，让他回去。'),
+    N('他站在门口，看了你一会儿，点了点头，转身走了。'),
+    I('你看他的背影，想起了李德武。他们走路的样子有点像。'),
+    N('那之后，经营点照旧。吴姐照旧算账，老吕照旧看库房。'),
+    N('你又雇了个司机，是个话少的中年人，开车稳。'),
+    N('摩托车油的生意一直不温不火。第二年，你改做了冷冻机油。'),
+    N('物流公司照旧挂着几十个车牌，每年缴税、办证，旱涝保收。'),
+    L('没有谁来找过你。'),
+  ],
+  choices: () => [
+    { tag: '查账', text: '你想起李德武留下的那笔钱，决定查一查。', next: 'chen_refuse_check', effects: { chenTruth: 15 } },
+    { tag: '不管', text: '你把账本交给吴姐，什么也不问。', next: 'chen_refuse_plain', effects: {} },
+    { tag: '打听', text: '你托人打听刘阳的下落。', next: 'chen_refuse_look', effects: { chenTruth: 10 } },
+  ],
+};
+
+SCENES.chen_refuse_check = {
+  lines: [
+    N('你查了。吴姐把每一笔都摊在桌上：税费、道路运输证、挂靠费。'),
+    N('有些地方对得上，有些地方对不上。'),
+    S('吴姐', 'wu', '这钱是哪来的，你自己心里有数。'),
+    N('你没说话。她把账本合上。'),
+    I('你知道这钱不干净。你只是从没想过，自己会为这点钱睡不着觉。'),
+  ],
+  next: 'chen_refuse_plain',
+  continueText: '过了一段时间',
+};
+
+SCENES.chen_refuse_look = {
+  lines: [
+    N('托的人回来回话：那个姓刘的，早先在广场卖烟，后来跟一个叫三眼儿的一起。'),
+    N('三眼儿跑了，姓刘的也不知去向。'),
+    I('你忽然想起李德武说过：这世上很多事，不是钱的事。'),
+  ],
+  next: 'chen_refuse_plain',
+  continueText: '那之后',
+};
+
+SCENES.chen_refuse_plain = {
+  title: '二〇〇四年 · 一个普通女人',
+  where: '经营点 · 二层',
+  lines: [
+    N('二〇〇四年冬天，沈阳下了很大的雪。'),
+    N('你在经营点楼上坐着，喝一杯热水。楼下有人喊你的名字。'),
+    N('康康的事，你没有经历。没有那个孩子，也没有那次高烧。'),
+    N('你一个人过了很多年。有时夜里醒来，会想起李德武在棚顶夹层里刨出来的钱。'),
+    L('水没有漫上来。你站在岸上看了一会儿，转身回去了。'),
+  ],
+  choices: () => [
+    { tag: '把钱捐出去', text: '你把那笔钱以李德武的名义捐了出去。', next: 'chen_refuse_ending', effects: { money: -20 } },
+    { tag: '留着', text: '你把钱留着。这世上，钱比人可靠。', next: 'chen_refuse_ending', effects: { money: 10 } },
+    { tag: '找李德武的坟', text: '你去打听李德武葬在哪儿。', next: 'chen_refuse_ending', effects: { chenTruth: 10 } },
+  ],
+};
+
+SCENES.chen_refuse_ending = () => {
+  const f = G.flags;
+  if (f.chenTruth >= 20) {
+    showEnding({
+      num: 1,
+      summary: '你把钱捐了出去，署名没有写。那天傍晚，你站在雪地里，忽然觉得身上的味道散了一些。没有谁来找过你，你也没有去找谁。故事在这条线上，没有变成悲剧。',
+      quote: '我站在岸上，看见水退下去了。'
+    });
+  } else {
+    showEnding({
+      num: 3,
+      summary: '你什么也没改变。钱还在，公司还在，日子还在。你活得比谁都稳，只是每到冬天，你会想起那个站在门口看你的年轻人，想不起来他叫什么名字。',
+      quote: '活人的日子怎么过，也成问题。'
+    });
+  }
+};
+
+
+/* ===== engine.js ===== */
+/* ============================================================
+ *  《于洪》互动小说引擎
+ * ============================================================ */
+const BASE_FLAGS = {
+  calledLi: null, tippedLi: null, roleInJob: null, borrowedMoto: null, borrowedName: null,
+  toldChenRed: null,
+  // ==== 关键转折（决定命运走向，不再只是态度）====
+  liuTurn: null,   // 'in' 入伙 | 'out' 退出 | 'reported' 举报
+  haoTurn: null,   // 'stayed' 留下 | 'ran' 逃亡 | 'reported' 报警
+  chenTurn: null,  // 'hired' 招了刘阳 | 'fired' 赶走刘阳
+  liuHaojie: 0, liuChenHong: 0, haoHaojie: 0, chenLiu: 0, chenTruth: 0,
+  money: 0, policeHeat: 0, liuSuspected: 0, haoWanted: 0, haoRage: 40,
+  jieLiu: 20, jieWater: 55,
+  jieHospital: false, kangKang: 'normal', kangKangAlive: true,
+  jieAlive: true, liuAlive: true, haoAlive: true, chenAlive: true,
+};
+
+/* ---------------- 状态 ---------------- */
+const G = {
+  scene: null,
+  flags: {},
+  seen: {},
+  char: null,
+  log: [],
+  history: [],
+  typing: false,
+  typeTimer: null,
+  waitingClick: false,
+  pending: null,
+  curLines: [],
+  curIdx: 0,
+  inScene: false,
+};
+
+/* ---------------- 模型接入（OpenAI 兼容）---------------- */
+const LLM = { url: '', model: '', key: '', enabled: false };
+
+function setLLMConfig(cfg) {
+  cfg = cfg || {};
+  LLM.url = (cfg.url || '').trim();
+  LLM.model = (cfg.model || '').trim();
+  LLM.key = (cfg.key || '').trim();
+  LLM.enabled = !!(LLM.url && LLM.model);
+}
+
+function llmReady() { return LLM.enabled; }
+
+async function llmChat(messages, opts) {
+  opts = opts || {};
+  if (!LLM.enabled) throw new Error('没有配置模型');
+  const headers = { 'Content-Type': 'application/json' };
+  if (LLM.key) headers['Authorization'] = 'Bearer ' + LLM.key;
+  const body = {
+    model: LLM.model,
+    messages: messages,
+    temperature: opts.temperature == null ? 0.9 : opts.temperature,
+  };
+  if (opts.maxTokens) body.max_tokens = opts.maxTokens;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), opts.timeout || 60000);
+  let res;
+  try {
+    res = await fetch(LLM.url, { method: 'POST', headers: headers, body: JSON.stringify(body), signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error('HTTP ' + res.status + ' ' + t.slice(0, 160));
+  }
+  const data = await res.json();
+  const msg = data && data.choices && data.choices[0] && data.choices[0].message;
+  const text = msg ? (typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)) : '';
+  if (!text) throw new Error('返回内容为空');
+  return text.trim();
+}
+
+async function llmTest(cfg) {
+  const saved = { url: LLM.url, model: LLM.model, key: LLM.key, enabled: LLM.enabled };
+  LLM.url = cfg.url; LLM.model = cfg.model; LLM.key = cfg.key || ''; LLM.enabled = true;
+  try {
+    const reply = await llmChat(
+      [{ role: 'user', content: '只回复两个字：正常' }],
+      { temperature: 0, maxTokens: 16, timeout: 20000 }
+    );
+    return LLM.model + ' 已响应「' + reply.slice(0, 20) + '」';
+  } finally {
+    LLM.url = saved.url; LLM.model = saved.model; LLM.key = saved.key; LLM.enabled = saved.enabled;
+  }
+}
+
+/* 让模型给当前节点续写一小段（离线时返回 null，由剧本原文接上） */
+async function llmNarrate(sceneId, sceneTitle, recentLines, charName) {
+  if (!LLM.enabled) return null;
+  const sys = [
+    '你在续写一篇以沈阳为背景的中文短篇小说，风格参考班宇：',
+    '句子短，口语化，多用具体物件，不写心理总结，不解释人物动机，不出现现代词汇。',
+    '只输出正文，不要标题，不要任何说明，80 到 140 字。'
+  ].join('');
+  const user = [
+    '当前章节：' + (sceneTitle || ''),
+    '正在叙述的人：' + (charName || ''),
+    '刚刚发生的几句：',
+    (recentLines || []).slice(-6).map(l => l.text || l).join('\n'),
+    '请接一段，保持同样的口吻，往前推一点点。'
+  ].join('\n');
+  try {
+    return await llmChat([{ role: 'system', content: sys }, { role: 'user', content: user }], { maxTokens: 400 });
+  } catch (e) {
+    return null; // 失败就静默回落到离线剧情
+  }
+}
+
+function resetState() {
+  G.scene = null; G.flags = JSON.parse(JSON.stringify(BASE_FLAGS));
+  G.seen = {}; G.char = null; G.log = []; G.history = [];
+  G.typing = false; G.waitingClick = false; G.pending = null;
+  G.curLines = []; G.curIdx = 0; G.inScene = false;
+}
+function snapshot() {
+  return JSON.stringify({ scene: G.scene, flags: G.flags, seen: G.seen, char: G.char, log: G.log.slice(-300) });
+}
+function restore(str) {
+  const s = JSON.parse(str);
+  resetState();
+  G.scene = s.scene; G.flags = s.flags; G.seen = s.seen || {}; G.char = s.char; G.log = s.log || [];
+}
+function setFlag(k, v) {
+  if (typeof v === 'number') G.flags[k] = (G.flags[k] || 0) + v;
+  else G.flags[k] = v;
+}
+function clampFlags() {
+  const lo = ['liuHaojie','liuChenHong','haoHaojie','chenLiu','chenTruth','money','policeHeat','liuSuspected','haoWanted','haoRage','jieLiu','jieWater'];
+  lo.forEach(k => {
+    if (typeof G.flags[k] === 'number') G.flags[k] = Math.max(0, Math.min(100, G.flags[k]));
+  });
+}
+function has(scene) { return !!G.seen[scene]; }
+
+/* ---------------- 角色 ---------------- */
+const CHARS = {
+  liu:  { name: '刘阳',   title: '退伍兵 · 于洪广场的烟摊 · 叙述者', color: '#8b1d18' },
+  hao:  { name: '郝鹏飞', title: '外号三眼儿 · 侦察兵出身 · 背了五年黑锅的人', color: '#1d3f6e' },
+  jie:  { name: '郝洁',   title: '郝鹏飞的姐姐 · 从大连回来的人 · 读书的人', color: '#7a5b1e' },
+  chen: { name: '陈红',   title: '物流公司女老板 · 李德武的前妻 · 钱的主人', color: '#6b2d5e' },
+};
+
+/* ---------------- 打字器 ---------------- */
+const SPEED = 13;
+function clearTimers() {
+  if (G.typeTimer) { clearTimeout(G.typeTimer); G.typeTimer = null; }
+  G.typing = false;
+}
+
+function line(opts) {
+  const el = document.createElement('div');
+  el.className = 'line ' + (opts.cls || '');
+  if (opts.who) {
+    const w = document.createElement('span');
+    w.className = 'who ' + (opts.whoKey || '');
+    w.textContent = opts.who;
+    el.appendChild(w);
+  }
+  const body = document.createElement('span');
+  body.className = 'body';
+  body.dataset.full = opts.text || '';
+  el.appendChild(body);
+  const box = document.getElementById('stream');
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+  return { el, body };
+}
+
+function typeText(body, text, done) {
+  clearTimers();
+  G.typing = true;
+  let i = 0;
+  body.textContent = '';
+  const step = () => {
+    if (i >= text.length) { G.typing = false; G.typeTimer = null; done && done(); return; }
+    const n = Math.max(1, Math.round(Math.random() * 2));
+    body.textContent += text.slice(i, i + n);
+    i += n;
+    const box = document.getElementById('stream');
+    box.scrollTop = box.scrollHeight;
+    G.typeTimer = setTimeout(step, SPEED + Math.random() * SPEED);
+  };
+  step();
+}
+
+function playLines(lines, done) {
+  G.curLines = lines; G.curIdx = 0; G.inScene = true;
+  const next = () => {
+    if (G.curIdx >= lines.length) { G.inScene = false; done && done(); return; }
+    const o = lines[G.curIdx++];
+    if (!o) { next(); return; }
+    const { body } = line(o);
+    if (o.instant) { body.textContent = o.text || ''; next(); return; }
+    typeText(body, o.text || '', next);
+  };
+  next();
+}
+
+/* 点击跳过：第一次点补全当前行并继续播剩下的；再点推进 */
+document.addEventListener('click', () => {
+  if (G.typing) {
+    clearTimers();
+    const all = document.querySelectorAll('#stream .line .body');
+    const last = all[all.length - 1];
+    if (last) last.textContent = last.dataset.full || '';
+    // 继续播剩余行
+    const lines = G.curLines, start = G.curIdx;
+    const rest = lines.slice(start);
+    playLinesRest(rest);
+    return;
+  }
+}, true);
+
+function playLinesRest(rest) {
+  let idx = 0;
+  G.typing = false;
+  const next = () => {
+    if (idx >= rest.length) {
+      G.inScene = false;
+      if (G._afterLines) { const f = G._afterLines; G._afterLines = null; f(); }
+      return;
+    }
+    const o = rest[idx++];
+    if (!o) { next(); return; }
+    const { body } = line(o);
+    body.textContent = o.text || '';
+    body.parentNode.classList.add('quick');
+    next();
+  };
+  next();
+}
+
+/* ---------------- 渲染工具 ---------------- */
+function renderChoices(list) {
+  const box = document.getElementById('choices');
+  box.innerHTML = '';
+  if (!list || !list.length) return;
+  list.forEach((c) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    if (c.tag) {
+      const t = document.createElement('span');
+      t.className = 'tag';
+      t.textContent = c.tag;
+      btn.appendChild(t);
+    }
+    const txt = document.createElement('span');
+    txt.textContent = c.text;
+    btn.appendChild(txt);
+    btn.onclick = () => {
+      box.innerHTML = '';
+      const { body } = line({ cls: 'chosen', text: '' });
+      body.textContent = '▶ ' + c.text;
+      if (c.effects) Object.keys(c.effects).forEach(k => setFlag(k, c.effects[k]));
+      clampFlags();
+      G.history.push({ scene: G.scene, choice: c.text, snap: snapshot() });
+      G.seen[G.scene] = (G.seen[G.scene] || 0) + 1;
+      renderStatus();
+      goto(c.next);
+    };
+    box.appendChild(btn);
+  });
+}
+
+function renderContinue(text, next) {
+  const box = document.getElementById('choices');
+  box.innerHTML = '';
+  const btn = document.createElement('button');
+  btn.className = 'choice continue';
+  btn.textContent = text || '继续';
+  btn.onclick = () => { box.innerHTML = ''; goto(next); };
+  box.appendChild(btn);
+}
+
+/* ---------------- 场景跳转 ---------------- */
+function resolve(id) {
+  if (!id) return { lines: [{ text: '（故事到此为止。）' }] };
+  if (typeof id === 'function') return { fn: id };
+  const s = SCENES[id];
+  if (!s) return { lines: [{ text: '（缺失场景：' + id + '）', cls: 'err' }] };
+  // 结局路由是以函数形式存放的场景，直接交给 goto 执行
+  if (typeof s === 'function') return { fn: s };
+  const visit = G.seen[id] || 0;
+  if (s.variants && s.variants.length) {
+    const v = s.variants[Math.min(visit, s.variants.length - 1)];
+    return resolve(v);
+  }
+  return s;
+}
+
+function goto(id) {
+  if (typeof id === 'string') G.scene = id;
+  const sc = resolve(id);
+  if (sc.fn) { sc.fn(); return; }
+  if (sc.title) {
+    const t = document.createElement('div');
+    t.className = 'scene-title';
+    t.textContent = sc.title;
+    document.getElementById('stream').appendChild(t);
+  }
+  if (sc.where) {
+    const t = document.createElement('div');
+    t.className = 'scene-where';
+    t.textContent = sc.where;
+    document.getElementById('stream').appendChild(t);
+  }
+  const box = document.getElementById('stream');
+  box.scrollTop = box.scrollHeight;
+
+  G._afterLines = () => {
+    // 配了模型就让它先续一小段，然后再出选项 / 继续按钮
+    if (LLM.enabled && sc.lines && sc.lines.length) {
+      appendModelLine(sc);
+    } else {
+      afterScene(sc);
+    }
+  };
+  playLines(sc.lines || [], G._afterLines);
+}
+
+function afterScene(sc) {
+  if (sc.choices) {
+    renderChoices(typeof sc.choices === 'function' ? sc.choices() : sc.choices);
+  } else if (sc.next) {
+    renderContinue(sc.continueText || '继续', sc.next);
+  } else if (sc.end) {
+    const btn = document.createElement('button');
+    btn.className = 'choice continue';
+    btn.textContent = sc.continueText || '……';
+    btn.onclick = () => {
+      if (typeof sc.end === 'function') sc.end();
+      else location.reload();
+    };
+    document.getElementById('choices').appendChild(btn);
+  }
+}
+
+/* 在场景末尾追加一段由模型写的文字；失败就跳过，不影响剧情推进 */
+function appendModelLine(sc) {
+  const stream = document.getElementById('stream');
+  const hint = document.createElement('div');
+  hint.className = 'model-line pending';
+  hint.textContent = '（正在续写……）';
+  stream.appendChild(hint);
+  stream.scrollTop = stream.scrollHeight;
+
+  const charName = G.char && CHARS[G.char] ? CHARS[G.char].name : '';
+  llmNarrate(G.scene, sc.title, sc.lines, charName).then(text => {
+    if (!text) {
+      hint.remove();
+      afterScene(sc);
+      return;
+    }
+    hint.remove();
+    const el = document.createElement('div');
+    el.className = 'line model-line';
+    el.textContent = text;
+    stream.appendChild(el);
+    stream.scrollTop = stream.scrollHeight;
+    afterScene(sc);
+  });
+}
+
+/* ---------------- 存档 ---------------- */
+const SAVE_KEY = 'yuhong_save_v2';
+function saveGame() {
+  try { localStorage.setItem(SAVE_KEY, snapshot()); return true; }
+  catch (e) { return false; }
+}
+function loadGame() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    restore(raw);
+    document.getElementById('menu').classList.add('hidden');
+    document.getElementById('game').classList.remove('hidden');
+    document.getElementById('ending').classList.add('hidden');
+    renderStatus();
+    document.getElementById('stream').innerHTML = '';
+    goto(G.scene);
+    return true;
+  } catch (e) { return false; }
+}
+
+/* ---------------- 状态面板 ---------------- */
+function renderStatus() {
+  const box = document.getElementById('status');
+  if (!G.char) { box.innerHTML = ''; return; }
+  const c = CHARS[G.char];
+  const f = G.flags;
+  const bar = (label, v, color) => {
+    const p = Math.max(0, Math.min(100, v || 0));
+    return `<div class="stat"><span class="sl">${label}</span><span class="bar"><i style="width:${p}%;background:${color}"></i></span><span class="sv">${p}</span></div>`;
+  };
+  const rows = [];
+  if (G.char === 'liu') {
+    rows.push(bar('与郝洁', f.liuHaojie, '#c08b3e'));
+    rows.push(bar('与陈红', f.liuChenHong, '#8e4a8a'));
+    rows.push(bar('手里的钱', f.money, '#4d7a4d'));
+    rows.push(bar('警方的注意', f.policeHeat, '#b03a2e'));
+  } else if (G.char === 'hao') {
+    rows.push(bar('对姐姐', f.haoHaojie, '#c08b3e'));
+    rows.push(bar('通缉的火候', f.haoWanted, '#b03a2e'));
+    rows.push(bar('心里的恨', f.haoRage, '#6b1f18'));
+  } else if (G.char === 'jie') {
+    rows.push(bar('对刘阳', f.jieLiu, '#8b1d18'));
+    rows.push(bar('对弟弟', f.haoHaojie, '#1d3f6e'));
+    rows.push(bar('心里压着的水', f.jieWater, '#3a5f7a'));
+  } else if (G.char === 'chen') {
+    rows.push(bar('对刘阳', f.chenLiu, '#8b1d18'));
+    rows.push(bar('账上的钱', f.money, '#4d7a4d'));
+    rows.push(bar('警方的注意', f.policeHeat, '#b03a2e'));
+  }
+  box.innerHTML = `<div class="who-card" style="border-left-color:${c.color}">
+      <div class="wname" style="color:${c.color}">${c.name}</div>
+      <div class="wtitle">${c.title}</div></div><div class="stats">${rows.join('')}</div>`;
+}
+
+/* ---------------- 随机开场 ---------------- */
+function randomChar() {
+  const keys = ['liu', 'hao', 'jie', 'chen'];
+  return keys[Math.floor(Math.random() * keys.length)];
+}
+
+function startGame(charKey) {
+  if (!CHARS[charKey]) charKey = randomChar();
+  resetState();
+  G.char = charKey;
+  if (charKey === 'jie') { G.flags.jieLiu = 20; G.flags.jieWater = 55; G.flags.haoHaojie = 65; }
+  if (charKey === 'chen') { G.flags.chenLiu = 10; G.flags.money = 40; G.flags.chenTruth = 5; }
+  if (charKey === 'hao') { G.flags.haoHaojie = 65; G.flags.haoRage = 40; G.flags.haoWanted = 10; }
+  if (charKey === 'liu') { G.flags.liuHaojie = 0; G.flags.money = 0; G.flags.policeHeat = 10; }
+  document.getElementById('menu').classList.add('hidden');
+  document.getElementById('game').classList.remove('hidden');
+  document.getElementById('ending').classList.add('hidden');
+  renderStatus();
+  document.getElementById('stream').innerHTML = '';
+  goto({ liu: 'liu_1999', hao: 'hao_1999', jie: 'jie_1999', chen: 'chen_1999' }[charKey]);
+}
+
+/* ---------------- 结局卡片 ---------------- */
+const ENDINGS = [
+  { n: '结局一', t: '直起腰来', d: '走出瀑布，进入海中。' },
+  { n: '结局二', t: '水中的两个人', d: '两个人都不肯先放手。' },
+  { n: '结局三', t: '各自的命数', d: '活着的日子还得接着过下去。' },
+  { n: '结局四', t: '帆影', d: '远处楼群正如帆影，扬起一角，缓缓移动。' },
+  { n: '结局五', t: '千禧年的雪', d: '一九九九年的最后一天，雪不大。' },
+];
+
+function showEnding(info) {
+  info = info || {};
+  const box = document.getElementById('ending');
+  const c = CHARS[G.char];
+  const e = ENDINGS[Math.max(0, Math.min(4, (info.num || 1) - 1))];
+  box.innerHTML = `<div class="end-card">
+      <div class="end-kicker">${e.n}</div>
+      <h2 class="end-title">${e.t}</h2>
+      <div class="end-desc">${e.d}</div>
+      <div class="end-you">你扮演的是 <b style="color:${c.color}">${c.name}</b></div>
+      ${info.summary ? `<div class="end-summary">${info.summary}</div>` : ''}
+      ${info.quote ? `<div class="end-quote">${info.quote}</div>` : ''}
+      <div class="end-btns">
+        <button class="choice continue" onclick="backToMenu()">重开一次（换一个人）</button>
+      </div>
+    </div>`;
+  box.classList.remove('hidden');
+  document.getElementById('choices').innerHTML = '';
+  try { localStorage.removeItem(SAVE_KEY); } catch (err) {}
+}
+</script>
+<script>
+function randomStart() {
+  startGame(randomChar());
+}
+function tryLoad() {
+  if (!loadGame()) alert('没有找到上次的进度。');
+}
+function restartGame() {
+  if (!confirm('回到开头，重新选一个人？')) return;
+  try { location.reload(); } catch (e) { backToMenu(); }
+  setTimeout(function () {
+    var game = document.getElementById('game');
+    if (game && !game.classList.contains('hidden')) backToMenu();
+  }, 120);
+}
+
+/* ---------------- 模型设置 ---------------- */
+const CFG_KEY = 'yuhong_llm_cfg';
+
+function readConfig() {
+  let cfg = { url: '', model: '', key: '' };
+  try {
+    const raw = localStorage.getItem(CFG_KEY);
+    if (raw) cfg = Object.assign(cfg, JSON.parse(raw));
+  } catch (e) {}
+  return cfg;
+}
+
+function refreshConfigUI() {
+  const cfg = readConfig();
+  const u = document.getElementById('cfgUrl');
+  const m = document.getElementById('cfgModel');
+  const k = document.getElementById('cfgKey');
+  const s = document.getElementById('cfgstate');
+  if (u) u.value = cfg.url || '';
+  if (m) m.value = cfg.model || '';
+  if (k) k.value = cfg.key || '';
+  if (s) s.textContent = (cfg.url && cfg.model) ? '已配置：' + cfg.model : '未配置（离线模式）';
+  if (typeof setLLMConfig === 'function') setLLMConfig(cfg);
+}
+
+function saveConfig() {
+  const cfg = {
+    url: (document.getElementById('cfgUrl').value || '').trim(),
+    model: (document.getElementById('cfgModel').value || '').trim(),
+    key: (document.getElementById('cfgKey').value || '').trim(),
+  };
+  try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
+  if (typeof setLLMConfig === 'function') setLLMConfig(cfg);
+  refreshConfigUI();
+  const msg = document.getElementById('cfgmsg');
+  if (msg) {
+    msg.className = 'cfgmsg ok';
+    msg.textContent = (cfg.url && cfg.model) ? '已保存，关键节点会调用模型。' : '已保存（离线模式）。';
+  }
+}
+
+function clearConfig() {
+  try { localStorage.removeItem(CFG_KEY); } catch (e) {}
+  if (typeof setLLMConfig === 'function') setLLMConfig({ url: '', model: '', key: '' });
+  refreshConfigUI();
+  const msg = document.getElementById('cfgmsg');
+  if (msg) { msg.className = 'cfgmsg'; msg.textContent = '已清除，回到离线模式。'; }
+}
+
+function testConfig() {
+  const msg = document.getElementById('cfgmsg');
+  const url = (document.getElementById('cfgUrl').value || '').trim();
+  const model = (document.getElementById('cfgModel').value || '').trim();
+  const key = (document.getElementById('cfgKey').value || '').trim();
+  if (!url || !model) {
+    if (msg) { msg.className = 'cfgmsg err'; msg.textContent = '地址和模型 ID 都得填。'; }
+    return;
+  }
+  if (msg) { msg.className = 'cfgmsg'; msg.textContent = '正在测试……'; }
+  if (typeof llmTest === 'function') {
+    llmTest({ url, model, key }).then(function (info) {
+      if (msg) { msg.className = 'cfgmsg ok'; msg.textContent = '连通正常：' + info; }
+    }).catch(function (err) {
+      if (msg) { msg.className = 'cfgmsg err'; msg.textContent = '连接失败：' + (err && err.message ? err.message : err); }
+    });
+  } else {
+    if (msg) { msg.className = 'cfgmsg err'; msg.textContent = '引擎未加载模型模块。'; }
+  }
+}
+
+function backToMenu() {
+  var menu = document.getElementById('menu');
+  var game = document.getElementById('game');
+  var ending = document.getElementById('ending');
+  var stream = document.getElementById('stream');
+  var choices = document.getElementById('choices');
+  if (game) game.classList.add('hidden');
+  if (ending) ending.classList.add('hidden');
+  if (menu) menu.classList.remove('hidden');
+  if (stream) stream.innerHTML = '';
+  if (choices) choices.innerHTML = '';
+  if (typeof resetState === 'function') resetState();
+  if (typeof G !== 'undefined' && G) { G.char = null; G.scene = null; }
+  refreshConfigUI();
+}
+
+document.addEventListener('DOMContentLoaded', refreshConfigUI);
+</script>
+</body>
+</html>

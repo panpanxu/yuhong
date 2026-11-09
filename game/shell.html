@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>于洪 · 互动小说</title>
+<style>/*__CSS__*/</style>
+</head>
+<body>
+
+<div id="menu">
+  <h1 class="menutitle">于洪</h1>
+  <div class="menusub">班宇《于洪》· 互动小说 · 二〇〇四年的沈阳</div>
+  <div class="menuquote">
+    洪水是有温度的，内部暖热，这点没想到过。但也危险，如旋涡一般，拉着我们往下坠。<br>
+    ——一九九八年，你是抗洪一代。一声令下，半句废话没有。<br>
+    可回来之后，反而越活越越回旋了。<br>
+    <em>这一次，你可以选一个人，替他把那几年重新走一遍。</em>
+  </div>
+  <div class="menubtns">
+    <button class="choice" onclick="randomStart()"><span class="tag">随机</span><span>随机进入一个人的叙述</span></button>
+    <button class="choice" onclick="startGame('liu')"><span class="tag">刘阳</span><span>从部队复员，在家等分配</span></button>
+    <button class="choice" onclick="startGame('hao')"><span class="tag">郝鹏飞</span><span>在九路市场底下看自行车</span></button>
+    <button class="choice" onclick="startGame('jie')"><span class="tag">郝洁</span><span>从大连回来，伺候妈</span></button>
+    <button class="choice" onclick="startGame('chen')"><span class="tag">陈红</span><span>汽配城的经营点，还有一笔钱</span></button>
+  </div>
+
+  <details id="cfgbox" class="cfgbox">
+    <summary>模型设置 <span class="cfgstate" id="cfgstate">未配置（离线模式）</span></summary>
+    <div class="cfgbody">
+      <p class="cfgnote">
+        填写 OpenAI 兼容接口后，关键节点会由模型实时续写一小段。不填也能完整游玩，只是所有剧情按写好的走。
+      </p>
+      <label class="cfgrow">
+        <span class="cfglabel">模型地址</span>
+        <input id="cfgUrl" class="cfginput" type="text" placeholder="http://127.0.0.1:11434/v1/chat/completions" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="cfgrow">
+        <span class="cfglabel">模型 ID</span>
+        <input id="cfgModel" class="cfginput" type="text" placeholder="比如 qwen2.5 / deepseek-chat" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="cfgrow">
+        <span class="cfglabel">API Key</span>
+        <input id="cfgKey" class="cfginput" type="password" placeholder="没有就留空" autocomplete="off" spellcheck="false">
+      </label>
+      <div class="cfgbtns">
+        <button type="button" class="cfgbtn" onclick="saveConfig()">保存</button>
+        <button type="button" class="cfgbtn" onclick="testConfig()">测试连通</button>
+        <button type="button" class="cfgbtn ghost" onclick="clearConfig()">清除</button>
+      </div>
+      <div class="cfgmsg" id="cfgmsg"></div>
+    </div>
+  </details>
+
+  <div class="menuload">
+    <button id="btnload" class="choice continue" onclick="tryLoad()">读取上次进度</button>
+  </div>
+</div>
+
+<div id="game" class="hidden">
+  <div id="topbar">
+    <span class="brand">于洪</span>
+    <span class="spacer"></span>
+    <button onclick="if(saveGame())this.textContent='已保存';">保存进度</button>
+    <button onclick="restartGame()">重开</button>
+  </div>
+  <div id="main">
+    <div id="stage">
+      <div id="stream"></div>
+      <div id="choices"></div>
+    </div>
+    <div id="side">
+      <div id="status"></div>
+    </div>
+  </div>
+</div>
+
+<div id="ending" class="hidden"></div>
+
+<script>/*__JS__*/</script>
+<script>
+function randomStart() {
+  startGame(randomChar());
+}
+function tryLoad() {
+  if (!loadGame()) alert('没有找到上次的进度。');
+}
+function restartGame() {
+  if (!confirm('回到开头，重新选一个人？')) return;
+  try { location.reload(); } catch (e) { backToMenu(); }
+  setTimeout(function () {
+    var game = document.getElementById('game');
+    if (game && !game.classList.contains('hidden')) backToMenu();
+  }, 120);
+}
+
+/* ---------------- 模型设置 ---------------- */
+const CFG_KEY = 'yuhong_llm_cfg';
+
+function readConfig() {
+  let cfg = { url: '', model: '', key: '' };
+  try {
+    const raw = localStorage.getItem(CFG_KEY);
+    if (raw) cfg = Object.assign(cfg, JSON.parse(raw));
+  } catch (e) {}
+  return cfg;
+}
+
+function refreshConfigUI() {
+  const cfg = readConfig();
+  const u = document.getElementById('cfgUrl');
+  const m = document.getElementById('cfgModel');
+  const k = document.getElementById('cfgKey');
+  const s = document.getElementById('cfgstate');
+  if (u) u.value = cfg.url || '';
+  if (m) m.value = cfg.model || '';
+  if (k) k.value = cfg.key || '';
+  if (s) s.textContent = (cfg.url && cfg.model) ? '已配置：' + cfg.model : '未配置（离线模式）';
+  if (typeof setLLMConfig === 'function') setLLMConfig(cfg);
+}
+
+function saveConfig() {
+  const cfg = {
+    url: (document.getElementById('cfgUrl').value || '').trim(),
+    model: (document.getElementById('cfgModel').value || '').trim(),
+    key: (document.getElementById('cfgKey').value || '').trim(),
+  };
+  try { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); } catch (e) {}
+  if (typeof setLLMConfig === 'function') setLLMConfig(cfg);
+  refreshConfigUI();
+  const msg = document.getElementById('cfgmsg');
+  if (msg) {
+    msg.className = 'cfgmsg ok';
+    msg.textContent = (cfg.url && cfg.model) ? '已保存，关键节点会调用模型。' : '已保存（离线模式）。';
+  }
+}
+
+function clearConfig() {
+  try { localStorage.removeItem(CFG_KEY); } catch (e) {}
+  if (typeof setLLMConfig === 'function') setLLMConfig({ url: '', model: '', key: '' });
+  refreshConfigUI();
+  const msg = document.getElementById('cfgmsg');
+  if (msg) { msg.className = 'cfgmsg'; msg.textContent = '已清除，回到离线模式。'; }
+}
+
+function testConfig() {
+  const msg = document.getElementById('cfgmsg');
+  const url = (document.getElementById('cfgUrl').value || '').trim();
+  const model = (document.getElementById('cfgModel').value || '').trim();
+  const key = (document.getElementById('cfgKey').value || '').trim();
+  if (!url || !model) {
+    if (msg) { msg.className = 'cfgmsg err'; msg.textContent = '地址和模型 ID 都得填。'; }
+    return;
+  }
+  if (msg) { msg.className = 'cfgmsg'; msg.textContent = '正在测试……'; }
+  if (typeof llmTest === 'function') {
+    llmTest({ url, model, key }).then(function (info) {
+      if (msg) { msg.className = 'cfgmsg ok'; msg.textContent = '连通正常：' + info; }
+    }).catch(function (err) {
+      if (msg) { msg.className = 'cfgmsg err'; msg.textContent = '连接失败：' + (err && err.message ? err.message : err); }
+    });
+  } else {
+    if (msg) { msg.className = 'cfgmsg err'; msg.textContent = '引擎未加载模型模块。'; }
+  }
+}
+
+function backToMenu() {
+  var menu = document.getElementById('menu');
+  var game = document.getElementById('game');
+  var ending = document.getElementById('ending');
+  var stream = document.getElementById('stream');
+  var choices = document.getElementById('choices');
+  if (game) game.classList.add('hidden');
+  if (ending) ending.classList.add('hidden');
+  if (menu) menu.classList.remove('hidden');
+  if (stream) stream.innerHTML = '';
+  if (choices) choices.innerHTML = '';
+  if (typeof resetState === 'function') resetState();
+  if (typeof G !== 'undefined' && G) { G.char = null; G.scene = null; }
+  refreshConfigUI();
+}
+
+document.addEventListener('DOMContentLoaded', refreshConfigUI);
+</script>
+</body>
+</html>

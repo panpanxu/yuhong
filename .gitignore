@@ -1,0 +1,9 @@
+# 临时与备份文件
+*.bak
+*.tmp
+probe.py
+test_*.js
+# 用户手动备份的副本，不入库
+于洪 - 原小说.html
+
+gh_create.py
