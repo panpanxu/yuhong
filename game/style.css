@@ -79,6 +79,11 @@ body {
 .cfgmsg.ok { color: #7f9c6b; }
 .cfgmsg.err { color: #c96a5f; }
 
+/* 访问计数 */
+.visitcount { margin-top: 22px; font-size: 11.5px; color: #4f4a42; letter-spacing: .08em; min-height: 16px; }
+.visitcount span { color: #6f6959; }
+#busuanzi_value_site_pv, #busuanzi_value_site_uv { color: var(--accent); }
+
 /* ---------- 游戏 ---------- */
 #game { min-height: 100%; display: flex; flex-direction: column; }
 #topbar {

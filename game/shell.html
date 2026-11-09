@@ -55,6 +55,8 @@
   <div class="menuload">
     <button id="btnload" class="choice continue" onclick="tryLoad()">读取上次进度</button>
   </div>
+
+  <div id="visitcount" class="visitcount"></div>
 </div>
 
 <div id="game" class="hidden">
@@ -180,7 +182,21 @@ function backToMenu() {
   refreshConfigUI();
 }
 
-document.addEventListener('DOMContentLoaded', refreshConfigUI);
+document.addEventListener('DOMContentLoaded', function () {
+  refreshConfigUI();
+  // 访问计数（仅在联网时生效，离线游玩不受影响）
+  if (/^https?:$/.test(location.protocol)) {
+    var box = document.getElementById('visitcount');
+    if (box) {
+      box.innerHTML = '本站访问 <span id="busuanzi_value_site_pv">…</span> 次 · 访客 <span id="busuanzi_value_site_uv">…</span> 人';
+    }
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+    s.onerror = function () { if (box) box.innerHTML = ''; };
+    document.body.appendChild(s);
+  }
+});
 </script>
 </body>
 </html>
